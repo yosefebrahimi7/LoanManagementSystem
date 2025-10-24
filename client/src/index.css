@@ -1,0 +1,14 @@
+@import "./assets/fonts/yekan/yekan.css";
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+@config "../daisyui.config.json";
+
+* {
+  font-family: 'YekanBakh', sans-serif;
+}
+
+body {
+  font-family: 'YekanBakh', sans-serif;
+}
