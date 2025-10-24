@@ -1,39 +1,19 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { showSuccessToast, showErrorToast } from '../lib/toast';
-import appHttp from '../lib/appHttp';
-import useAuth from '../stores/auth';
+import { Link } from 'react-router';
+import { useAuth } from '../hooks/useAuth';
 
 function Login() {
-  const navigate = useNavigate();
-  const setAuth = useAuth((state) => state.setAuth);
+  const { login, isLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { data } = await appHttp.post('/auth/login', formData);
-      
-      setAuth(data.user, data.token, data.refreshToken);
-      showSuccessToast('ورود با موفقیت انجام شد');
-      navigate('/users');
-    } catch (error: any) {
-      if (error?.response?.data?.message) {
-        showErrorToast(error.response.data.message);
-      } else if (error?.response?.status === 401) {
-        showErrorToast('ایمیل یا رمز عبور اشتباه است');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    await login(formData);
   };
 
   return (

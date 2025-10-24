@@ -1,8 +1,16 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useEffect } from "react";
 import useAuth from "../stores/auth";
 
 function Home() {
   const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen bg-base-200">
@@ -20,7 +28,7 @@ function Home() {
                 </p>
 
                 <div className="flex gap-4 justify-center flex-wrap">
-                  <Link to="/users" className="btn btn-primary btn-lg gap-2">
+                  <Link to="/dashboard" className="btn btn-primary btn-lg gap-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-6 w-6"

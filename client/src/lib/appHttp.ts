@@ -3,7 +3,7 @@ import { showErrorToast } from './toast';
 import useAuth from '../stores/auth';
 import { queryClient } from './queryClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7223/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 // ساخت instance اصلی axios
 const createApiInstance = () => {
@@ -13,7 +13,7 @@ const createApiInstance = () => {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-    withCredentials: true,
+    withCredentials: false,
   });
 
   // Request Interceptor - افزودن token به header
@@ -47,11 +47,12 @@ const createApiInstance = () => {
               refreshToken,
             });
 
-            const { token } = response.data;
-            useAuth.getState().setToken(token);
-
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return instance(originalRequest);
+            const { data } = response.data;
+            if (data && data.token) {
+              useAuth.getState().setToken(data.token);
+              originalRequest.headers.Authorization = `Bearer ${data.token}`;
+              return instance(originalRequest);
+            }
           }
         } catch (refreshError) {
           useAuth.getState().clear();

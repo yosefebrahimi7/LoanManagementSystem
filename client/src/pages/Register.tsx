@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { showSuccessToast, showErrorToast } from '../lib/toast';
-import appHttp from '../lib/appHttp';
-import useAuth from '../stores/auth';
+import { Link } from 'react-router';
+import { useAuth } from '../hooks/useAuth';
+import { showErrorToast } from '../lib/toast';
 
 function Register() {
-  const navigate = useNavigate();
-  const setAuth = useAuth((state) => state.setAuth);
+  const { register, isLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -17,7 +15,6 @@ function Register() {
     confirmPassword: '',
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,37 +34,7 @@ function Register() {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const { data } = await appHttp.post('/auth/register', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-      });
-      
-      setAuth(data.user, data.token, data.refreshToken);
-      showSuccessToast('ثبت نام با موفقیت انجام شد');
-      navigate('/users');
-    } catch (error: any) {
-      if (error?.response?.status === 400) {
-        showErrorToast('این ایمیل قبلا ثبت شده است');
-      } else if (error?.response?.data?.errors) {
-        const firstError = Object.values(error.response.data.errors)[0];
-        if (Array.isArray(firstError)) {
-          showErrorToast(firstError[0] as string);
-        } else {
-          showErrorToast('اطلاعات وارد شده نامعتبر است');
-        }
-      } else if (error?.response?.data?.message) {
-        showErrorToast(error.response.data.message);
-      } else {
-        showErrorToast('خطا در ثبت نام. لطفا دوباره تلاش کنید');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    await register(formData);
   };
 
   return (
