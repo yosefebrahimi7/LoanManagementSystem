@@ -95,13 +95,13 @@ function Dashboard() {
             </div>
 
             <div className="stat bg-base-100 rounded-lg shadow">
-              <div className="stat-figure text-accent">
+              <div className="stat-figure text-success">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 01.293.707V16a2 2 0 01-2 2H5a2 2 0 01-2-2V8zM5 8a2 2 0 012-2h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 01.293.707V16a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div className="stat-title">وام‌های تایید شده</div>
-              <div className="stat-value text-accent">
+              <div className="stat-value text-success">
                 {loansLoading ? '...' : (loans?.filter(loan => loan.status === 'approved').length || 0)}
               </div>
               <div className="stat-desc">این ماه</div>
@@ -232,13 +232,13 @@ function Dashboard() {
           </div>
 
           <div className="stat bg-base-100 rounded-lg shadow">
-            <div className="stat-figure text-accent">
+            <div className="stat-figure text-success">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 01.293.707V16a2 2 0 01-2 2H5a2 2 0 01-2-2V8zM5 8a2 2 0 012-2h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 01.293.707V16a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div className="stat-title">تایید شده</div>
-            <div className="stat-value text-accent">
+            <div className="stat-value text-success">
               {loansLoading ? '...' : (loans?.filter(loan => loan.status === 'approved').length || 0)}
             </div>
             <div className="stat-desc">وام‌های تایید شده</div>
