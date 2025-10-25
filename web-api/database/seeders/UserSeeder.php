@@ -25,7 +25,29 @@ class UserSeeder extends Seeder
             'role' => User::ROLE_ADMIN,
         ]);
 
-        // TODO :: Create Regular Users
+        // Create Regular Users
+        $user1 = User::create([
+            'first_name' => 'Test',
+            'last_name' => 'User 1',
+            'email' => 'test1@example.com',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+            'role' => User::ROLE_USER,
+        ]);
+
+        $user2 = User::create([
+            'first_name' => 'Test',
+            'last_name' => 'User 2',
+            'email' => 'test2@example.com',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+            'role' => User::ROLE_USER,
+        ]);
+
+        // Create wallets for users
+        Wallet::create(['user_id' => $admin->id, 'balance' => 0]);
+        Wallet::create(['user_id' => $user1->id, 'balance' => 0]);
+        Wallet::create(['user_id' => $user2->id, 'balance' => 0]);
         
     }
 }
