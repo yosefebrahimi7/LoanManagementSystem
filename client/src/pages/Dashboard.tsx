@@ -304,6 +304,9 @@ function Dashboard() {
             </div>
           </div>
         </div>
+        
+        {/* Extra spacing to ensure scroll works */}
+        <div className="h-20"></div>
       </div>
   );
 }
