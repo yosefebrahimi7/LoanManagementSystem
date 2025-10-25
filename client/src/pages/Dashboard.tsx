@@ -71,7 +71,7 @@ function Dashboard() {
             <div className="stat bg-base-100 rounded-lg shadow">
               <div className="stat-figure text-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
               </div>
               <div className="stat-title">کل وام‌ها</div>
@@ -82,13 +82,13 @@ function Dashboard() {
             </div>
 
             <div className="stat bg-base-100 rounded-lg shadow">
-              <div className="stat-figure text-secondary">
+              <div className="stat-figure text-warning">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div className="stat-title">در انتظار تایید</div>
-              <div className="stat-value text-secondary">
+              <div className="stat-value text-warning">
                 {loansLoading ? '...' : (loans?.filter(loan => loan.status === 'pending').length || 0)}
               </div>
               <div className="stat-desc">وام‌های در انتظار</div>
@@ -108,13 +108,13 @@ function Dashboard() {
             </div>
 
             <div className="stat bg-base-100 rounded-lg shadow">
-              <div className="stat-figure text-info">
+              <div className="stat-figure text-error">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div className="stat-title">وام‌های رد شده</div>
-              <div className="stat-value text-info">
+              <div className="stat-value text-error">
                 {loansLoading ? '...' : (loans?.filter(loan => loan.status === 'rejected').length || 0)}
               </div>
               <div className="stat-desc">این ماه</div>
@@ -208,7 +208,7 @@ function Dashboard() {
           <div className="stat bg-base-100 rounded-lg shadow">
             <div className="stat-figure text-primary">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
             </div>
             <div className="stat-title">وام‌های من</div>
@@ -219,13 +219,13 @@ function Dashboard() {
           </div>
 
           <div className="stat bg-base-100 rounded-lg shadow">
-            <div className="stat-figure text-secondary">
+            <div className="stat-figure text-warning">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div className="stat-title">در انتظار تایید</div>
-            <div className="stat-value text-secondary">
+            <div className="stat-value text-warning">
               {loansLoading ? '...' : (loans?.filter(loan => loan.status === 'pending').length || 0)}
             </div>
             <div className="stat-desc">وام‌های در انتظار</div>
@@ -245,13 +245,13 @@ function Dashboard() {
           </div>
 
           <div className="stat bg-base-100 rounded-lg shadow">
-            <div className="stat-figure text-info">
+            <div className="stat-figure text-error">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div className="stat-title">رد شده</div>
-            <div className="stat-value text-info">
+            <div className="stat-value text-error">
               {loansLoading ? '...' : (loans?.filter(loan => loan.status === 'rejected').length || 0)}
             </div>
             <div className="stat-desc">وام‌های رد شده</div>
