@@ -151,6 +151,8 @@ class AuthService implements AuthServiceInterface
             'lastName' => $user->last_name,
             'email' => $user->email,
             'isActive' => $user->is_active,
+            'role' => $user->role,
+            'roleName' => $user->role_name,
             'createdAt' => $user->created_at->toISOString(),
             'updatedAt' => $user->updated_at->toISOString(),
         ];
