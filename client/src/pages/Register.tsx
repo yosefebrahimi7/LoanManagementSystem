@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router';
-import { useAuth } from '../hooks/useAuth';
+import { useRegister } from '../hooks/useAuth';
 import { showErrorToast } from '../lib/toast';
 
 function Register() {
-  const { register, isLoading } = useAuth();
+  const registerMutation = useRegister();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -34,7 +34,7 @@ function Register() {
       return;
     }
 
-    await register(formData);
+    registerMutation.mutate(formData);
   };
 
   return (
@@ -162,9 +162,9 @@ function Register() {
               <button
                 type="submit"
                 className="btn btn-primary w-full"
-                disabled={isLoading}
+                disabled={registerMutation.isPending}
               >
-                {isLoading ? (
+                {registerMutation.isPending ? (
                   <>
                     <span className="loading loading-spinner"></span>
                     در حال ثبت نام...

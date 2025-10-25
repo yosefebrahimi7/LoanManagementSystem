@@ -23,5 +23,5 @@ const useAuth = create<AuthState>()(
   )
 );
 
+export { useAuth };
 export default useAuth;
-

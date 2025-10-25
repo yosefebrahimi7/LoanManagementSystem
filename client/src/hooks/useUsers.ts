@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import appHttp from '../lib/appHttp';
+import { appHttp } from '../lib/appHttp';
 import { showSuccessToast } from '../lib/toast';
 import type { User } from '../types';
 

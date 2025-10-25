@@ -114,7 +114,7 @@ const createApiInstance = () => {
 };
 
 // Export instance اصلی
-export const appHttp = createApiInstance();
+const appHttp = createApiInstance();
 
 // Export تابع سفارشی برای ساخت instance با تنظیمات دلخواه
 export const createCustomInstance = (config?: any) => {
@@ -127,4 +127,5 @@ export const createCustomInstance = (config?: any) => {
   return instance;
 };
 
+export { appHttp };
 export default appHttp;

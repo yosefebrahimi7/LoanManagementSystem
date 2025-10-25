@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router';
-import { useAuth } from '../hooks/useAuth';
+import { useLogin } from '../hooks/useAuth';
 
 function Login() {
-  const { login, isLoading } = useAuth();
+  const loginMutation = useLogin();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -13,7 +13,7 @@ function Login() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await login(formData);
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -69,20 +69,20 @@ function Login() {
 
             {/* Submit Button */}
             <div className="form-control mt-6">
-              <button
-                type="submit"
-                className="btn btn-primary w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="loading loading-spinner"></span>
-                    در حال ورود...
-                  </>
-                ) : (
-                  'ورود'
-                )}
-              </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary w-full"
+                  disabled={loginMutation.isPending}
+                >
+                  {loginMutation.isPending ? (
+                    <>
+                      <span className="loading loading-spinner"></span>
+                      در حال ورود...
+                    </>
+                  ) : (
+                    'ورود'
+                  )}
+                </button>
             </div>
           </form>
 
