@@ -124,9 +124,9 @@ export default function Header() {
                 </div>
               </div>
               <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                <li>
-                  <div className="text-sm font-semibold">
-                    {user?.firstName} {user?.lastName}
+                <li className="text-center">
+                  <div className="text-sm font-semibold mb-1">
+                    {user?.firstName}&nbsp;{user?.lastName}
                   </div>
                   <div className="text-xs text-base-content/60">
                     {user?.email}
@@ -135,7 +135,6 @@ export default function Header() {
                     )}
                   </div>
                 </li>
-                <li><hr className="my-2" /></li>
                 <li>
                   <button 
                     onClick={() => navigate('/profile')} 
@@ -155,7 +154,6 @@ export default function Header() {
                     </button>
                   </li>
                 )}
-                <li><hr className="my-2" /></li>
                 <li>
                   <button 
                     onClick={() => logoutMutation.mutate()} 
