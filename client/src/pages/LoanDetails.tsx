@@ -164,9 +164,9 @@ export default function LoanDetails() {
           {loan.schedules && loan.schedules.length > 0 && (
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-4">برنامه پرداخت</h2>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
                 <table className="table table-zebra w-full">
-                  <thead>
+                  <thead className="sticky top-0 bg-white z-10">
                     <tr>
                       <th>قسط</th>
                       <th>مبلغ کل</th>
@@ -213,17 +213,31 @@ export default function LoanDetails() {
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">نام</label>
                 <p className="font-semibold text-gray-900">
-                  {loan.user?.firstName} {loan.user?.lastName}
+                  {loan.user?.firstName && loan.user?.lastName 
+                    ? `${loan.user.firstName} ${loan.user.lastName}`
+                    : loan.user?.firstName || loan.user?.lastName || 'نامشخص'
+                  }
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">ایمیل</label>
-                <p className="font-semibold text-gray-900">{loan.user?.email}</p>
+                <p className="font-semibold text-gray-900">
+                  {loan.user?.email || 'نامشخص'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">شناسه کاربر</label>
+                <p className="font-semibold text-gray-900">
+                  #{loan.user_id}
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">تاریخ عضویت</label>
                 <p className="font-semibold text-gray-900">
-                  {loan.user ? new Date(loan.user.createdAt).toLocaleDateString('fa-IR') : 'نامشخص'}
+                  {loan.user?.createdAt 
+                    ? new Date(loan.user.createdAt).toLocaleDateString('fa-IR')
+                    : 'نامشخص'
+                  }
                 </p>
               </div>
             </div>
