@@ -649,6 +649,7 @@ $stats = $statisticsService->getStatistics();
 
 ## Sample Test Data
 The system includes seeded data for testing:
-- Admin user: `admin@loanmanagement.com` / `password123`
-- Regular users: `user1@example.com` to `user10@example.com` / `password123`
+- Admin user: `admin@example.com` / `password`
+- Regular users: `test1@example.com`, `test2@example.com` / `password`
+- Demo users: `user1@example.com` to `user10@example.com` / `password`
 - Various loan statuses and payment schedules
