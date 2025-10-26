@@ -37,6 +37,8 @@ export const useLoan = (loanId: number) => {
       return response.data.data as Loan;
     },
     enabled: !!loanId,
+    staleTime: 0, // Always fetch fresh data
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 };
 

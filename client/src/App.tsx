@@ -8,6 +8,9 @@ import Profile from "./pages/Profile";
 import LoanRequest from "./pages/LoanRequest";
 import LoanApproval from "./pages/LoanApproval";
 import LoanDetails from "./pages/LoanDetails";
+import LoanPayment from "./pages/LoanPayment";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 
@@ -87,6 +90,24 @@ const router = createBrowserRouter([
               </ProtectedRoute>
             </Layout>
           ),
+        },
+        {
+          path: "/loan-payment/:id",
+          element: (
+            <Layout>
+              <ProtectedRoute>
+                <LoanPayment />
+              </ProtectedRoute>
+            </Layout>
+          ),
+        },
+        {
+          path: "/payment/success",
+          element: <PaymentSuccess />,
+        },
+        {
+          path: "/payment/failed",
+          element: <PaymentFailed />,
         },
 ]);
 

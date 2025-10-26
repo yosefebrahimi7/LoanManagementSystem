@@ -255,7 +255,7 @@ export default function LoanDetails() {
               )}
               {!isAdmin && loan.status === 'approved' && (
                 <button
-                  onClick={() => navigate('/loan-payment')}
+                  onClick={() => navigate(`/loan-payment/${loan.id}`)}
                   className="btn btn-success w-full"
                 >
                   پرداخت وام
