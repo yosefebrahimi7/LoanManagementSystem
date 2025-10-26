@@ -2,6 +2,7 @@ import { useState } from "react";
 import useAuth from "../stores/auth";
 import { useAllLoans, useLoanApproval } from "../hooks/useLoans";
 import type { LoanApprovalDto } from "../types";
+import { getLoanStatusBadge } from "../utils/loanStatus";
 
 export default function LoanApproval() {
   const { user } = useAuth();
@@ -29,15 +30,6 @@ export default function LoanApproval() {
   const openModal = (loan: any) => {
     setSelectedLoan(loan);
     setShowModal(true);
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusMap = {
-      pending: { text: 'در انتظار تایید', class: 'badge-warning' },
-      approved: { text: 'تایید شده', class: 'badge-success' },
-      rejected: { text: 'رد شده', class: 'badge-error' },
-    };
-    return statusMap[status as keyof typeof statusMap] || { text: status, class: 'badge-neutral' };
   };
 
   if (user?.roleName !== 'admin') {
@@ -75,7 +67,7 @@ export default function LoanApproval() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {loans.map((loan) => {
-              const status = getStatusBadge(loan.status);
+              const status = getLoanStatusBadge(loan.status);
               return (
                 <div key={loan.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                   {/* Loan Header */}
@@ -201,8 +193,8 @@ export default function LoanApproval() {
                     </div>
                     <div>
                       <span className="text-gray-600">وضعیت:</span>
-                      <span className={`badge ${getStatusBadge(selectedLoan.status).class}`}>
-                        {getStatusBadge(selectedLoan.status).text}
+                      <span className={`badge ${getLoanStatusBadge(selectedLoan.status).class}`}>
+                        {getLoanStatusBadge(selectedLoan.status).text}
                       </span>
                     </div>
                     <div>

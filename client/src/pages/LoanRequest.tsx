@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useCreateLoan, useUserLoans } from "../hooks/useLoans";
 import type { LoanRequestDto } from "../types";
+import { getLoanStatusBadge } from "../utils/loanStatus";
 
 interface LoanFormData {
   amount: string;
@@ -53,14 +54,6 @@ export default function LoanRequest() {
     });
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusMap = {
-      pending: { text: 'در انتظار تایید', class: 'badge-warning' },
-      approved: { text: 'تایید شده', class: 'badge-success' },
-      rejected: { text: 'رد شده', class: 'badge-error' },
-    };
-    return statusMap[status as keyof typeof statusMap] || { text: status, class: 'badge-neutral' };
-  };
 
   return (
     <div>
@@ -212,7 +205,7 @@ export default function LoanRequest() {
                     </thead>
                     <tbody>
                       {userLoans.map((loan) => {
-                        const status = getStatusBadge(loan.status);
+                        const status = getLoanStatusBadge(loan.status);
                         return (
                           <tr key={loan.id}>
                             <td className="font-medium">

@@ -19,7 +19,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->is_active && ($user->id === $model->id || $this->isAdmin($user));
+        return $user->is_active && ($user->id === $model->id || $user->isAdmin());
     }
 
     /**
@@ -35,7 +35,7 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->is_active && ($user->id === $model->id || $this->isAdmin($user));
+        return $user->is_active && ($user->id === $model->id || $user->isAdmin());
     }
 
     /**
@@ -43,7 +43,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->is_active && $this->isAdmin($user) && $user->id !== $model->id;
+        return $user->is_active && $user->isAdmin() && $user->id !== $model->id;
     }
 
     /**
@@ -51,7 +51,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->is_active && $this->isAdmin($user);
+        return $user->is_active && $user->isAdmin();
     }
 
     /**
@@ -59,7 +59,7 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->is_active && $this->isAdmin($user) && $user->id !== $model->id;
+        return $user->is_active && $user->isAdmin() && $user->id !== $model->id;
     }
 
     /**
@@ -75,7 +75,7 @@ class UserPolicy
      */
     public function deactivate(User $user, User $model): bool
     {
-        return $user->is_active && $this->isAdmin($user) && $user->id !== $model->id;
+        return $user->is_active && $user->isAdmin() && $user->id !== $model->id;
     }
 
     /**
@@ -83,16 +83,6 @@ class UserPolicy
      */
     public function activate(User $user, User $model): bool
     {
-        return $user->is_active && $this->isAdmin($user);
-    }
-
-    /**
-     * Check if user is admin
-     */
-    private function isAdmin(User $user): bool
-    {
-        // You can implement admin logic here
-        // For now, we'll check if email contains 'admin'
-        return str_contains($user->email, 'admin');
+        return $user->is_active && $user->isAdmin();
     }
 }

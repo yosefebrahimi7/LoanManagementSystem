@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { useLoan } from "../hooks/useLoans";
 import useAuth from "../stores/auth";
+import { getLoanStatusBadge } from "../utils/loanStatus";
 
 export default function LoanDetails() {
   const { id } = useParams();
@@ -54,16 +55,7 @@ export default function LoanDetails() {
     );
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusMap = {
-      pending: { text: 'در انتظار تایید', class: 'badge-warning' },
-      approved: { text: 'تایید شده', class: 'badge-success' },
-      rejected: { text: 'رد شده', class: 'badge-error' },
-    };
-    return statusMap[status as keyof typeof statusMap] || { text: status, class: 'badge-neutral' };
-  };
-
-  const status = getStatusBadge(loan.status);
+  const status = getLoanStatusBadge(loan.status);
 
   return (
     <div>

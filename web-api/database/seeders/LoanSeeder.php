@@ -85,15 +85,7 @@ class LoanSeeder extends Seeder
     {
         $users = [];
         
-        // Use existing users from UserSeeder if they exist
-        $existingUsers = User::whereIn('email', ['test1@example.com', 'test2@example.com'])->get();
-        
-        if ($existingUsers->count() === 2) {
-            // Use existing users from UserSeeder
-            return $existingUsers->all();
-        }
-        
-        // Otherwise create demo users
+        // Always create demo users to ensure we have enough users for loans
         for ($i = 1; $i <= 10; $i++) {
             $email = "user{$i}@example.com";
             $users[] = User::firstOrCreate(

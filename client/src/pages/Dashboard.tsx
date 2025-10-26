@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import useAuth from '../stores/auth';
 import { useUserLoans, useAllLoans, useLoanStats } from '../hooks/useLoans';
 import { useLogout } from '../hooks/useAuth';
+import { getLoanStatusBadge, getLoanStatusText, getLoanStatusClass } from '../utils/loanStatus';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -149,11 +150,7 @@ function Dashboard() {
                   ) : loans && loans.length > 0 ? (
                     loans.slice(0, 3).map((loan) => (
                       <div key={loan.id} className="flex items-center gap-2">
-                        <div className={`badge ${
-                          loan.status === 'approved' ? 'badge-success' :
-                          loan.status === 'rejected' ? 'badge-error' :
-                          'badge-warning'
-                        }`}></div>
+                        <div className={`badge ${getLoanStatusClass(loan.status)}`}></div>
                         <span className="text-sm">
                           وام {loan.amount.toLocaleString()} تومان - {loan.user?.firstName} {loan.user?.lastName}
                         </span>
@@ -286,14 +283,9 @@ function Dashboard() {
                 ) : loans && loans.length > 0 ? (
                   loans.slice(0, 3).map((loan) => (
                     <div key={loan.id} className="flex items-center gap-2">
-                      <div className={`badge ${
-                        loan.status === 'approved' ? 'badge-success' :
-                        loan.status === 'rejected' ? 'badge-error' :
-                        'badge-warning'
-                      }`}></div>
+                      <div className={`badge ${getLoanStatusClass(loan.status)}`}></div>
                       <span className="text-sm">
-                        {loan.amount.toLocaleString()} تومان - {loan.status === 'pending' ? 'در انتظار' : 
-                        loan.status === 'approved' ? 'تایید شده' : 'رد شده'}
+                        {loan.amount.toLocaleString()} تومان - {getLoanStatusText(loan.status)}
                       </span>
                     </div>
                   ))
