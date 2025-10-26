@@ -74,21 +74,30 @@ export const useInitiatePayment = () => {
         amount,
       });
       
+      // Response structure: { success, payment_url, authority, payment_id }
       const data = response.data as PaymentResponse;
       
       if (data.success && data.payment_url) {
-        // Redirect to payment gateway
-        window.location.href = data.payment_url;
         return data;
       }
       
       throw new Error(data.message || 'Failed to initiate payment');
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       showSuccessToast('در حال هدایت به درگاه پرداخت...');
+      
+      // Redirect to payment gateway after a short delay
+      setTimeout(() => {
+        if (data.payment_url) {
+          window.location.href = data.payment_url;
+        }
+      }, 500);
     },
     onError: (error: any) => {
-      showErrorToast(error.response?.data?.message || 'خطا در شروع پرداخت');
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || 'خطا در شروع پرداخت';
+      showErrorToast(errorMessage);
     },
   });
 };

@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LoanController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\UserResource;
 use App\Models\Loan;
+use App\Models\LoanPayment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
+// Payment callback (public route for gateway)
+Route::match(['get', 'post'], '/payment/callback', [PaymentController::class, 'callback']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -42,6 +47,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [LoanController::class, 'adminIndex']);
         Route::get('/stats', [LoanController::class, 'stats']);
         Route::post('/{id}/approve', [LoanController::class, 'approve']);
+    });
+
+    // Payment routes
+    Route::prefix('payment')->group(function () {
+        Route::get('/history', [PaymentController::class, 'paymentHistory']);
+        Route::get('/status/{payment}', [PaymentController::class, 'paymentStatus']);
+        Route::post('/loans/{loan}/initiate', [PaymentController::class, 'initiatePayment']);
     });
 
     // Example of using API Resources directly in routes

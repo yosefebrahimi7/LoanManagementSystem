@@ -14,7 +14,7 @@ class LoanResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $result = [
             'id' => $this->id,
             'user_id' => $this->user_id,
             'amount' => $this->amount,
@@ -40,6 +40,8 @@ class LoanResource extends JsonResource
             'schedules' => LoanScheduleResource::collection($this->whenLoaded('schedules')),
             'payments' => LoanPaymentResource::collection($this->whenLoaded('payments')),
         ];
+
+        return $result;
     }
 
     /**
