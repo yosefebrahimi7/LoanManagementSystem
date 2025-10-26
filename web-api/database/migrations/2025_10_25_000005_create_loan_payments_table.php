@@ -17,15 +17,16 @@ return new class extends Migration
             $table->foreignId('loan_id')->constrained()->onDelete('cascade');
             $table->foreignId('loan_schedule_id')->nullable()->constrained()->onDelete('set null');
             $table->bigInteger('amount'); // payment amount
-            $table->string('payment_method', 20)->default('zarinpal'); // zarinpal, manual, etc.
-            $table->string('status', 20)->default('pending'); // pending, completed, failed, refunded
+            $table->string('payment_method')->default('zarinpal'); // zarinpal, manual
+            $table->string('status')->default('pending'); // pending, completed, failed, refunded
             $table->string('gateway_reference')->nullable(); // gateway transaction reference
-            $table->text('gateway_response')->nullable(); // full gateway response
+            $table->json('gateway_response')->nullable(); // full gateway response
             $table->text('notes')->nullable();
             $table->timestamps();
 
             $table->index('user_id');
             $table->index('loan_id');
+            $table->index('loan_schedule_id');
             $table->index('status');
             $table->index('gateway_reference');
         });
