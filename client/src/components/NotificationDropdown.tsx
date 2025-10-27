@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useNotifications, useUnreadNotificationsCount, useMarkNotificationAsRead, useDeleteNotification, useMarkAllNotificationsAsRead } from '../hooks/useNotifications';
 import type { Notification } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 import { faIR } from 'date-fns/locale';
 
 function NotificationDropdown() {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const { data, isLoading } = useNotifications(1, 10);
   const { data: unreadCount } = useUnreadNotificationsCount();
   const markAsReadMutation = useMarkNotificationAsRead();
@@ -29,10 +30,32 @@ function NotificationDropdown() {
     markAllAsReadMutation.mutate();
   };
 
+  const handleNotificationClick = (notification: Notification, e: React.MouseEvent) => {
+    const type = notification.data?.type || '';
+    const loanId = notification.data?.loan_id;
+
+    // Navigate based on notification type
+    if (type === 'new_loan_request' || type === 'loan_approved' || type === 'loan_rejected') {
+      // Navigate to loan approval page for admin, or loan details for user
+      navigate('/loan-approval');
+    } else if (type === 'payment_confirmed') {
+      // Navigate to payment history or loan details
+      if (loanId) {
+        navigate(`/loan-details/${loanId}`);
+      }
+    }
+    // If notification is unread, mark it as read
+    if (!notification.read_at) {
+      markAsReadMutation.mutate(notification.id);
+    }
+  };
+
   const getNotificationIcon = (notification: Notification) => {
     const type = notification.data?.type || '';
     
-    if (type.includes('approval') || type.includes('approve')) {
+    if (type === 'new_loan_request') {
+      return '📝';
+    } else if (type.includes('approval') || type.includes('approve')) {
       return '✓';
     } else if (type.includes('reject') || type.includes('rejection')) {
       return '✗';
@@ -49,7 +72,9 @@ function NotificationDropdown() {
   const getNotificationColor = (notification: Notification) => {
     const type = notification.data?.type || '';
     
-    if (type.includes('approval') || type.includes('approve') || type.includes('complete')) {
+    if (type === 'new_loan_request') {
+      return 'text-blue-600';
+    } else if (type.includes('approval') || type.includes('approve') || type.includes('complete')) {
       return 'text-green-600';
     } else if (type.includes('reject') || type.includes('rejection')) {
       return 'text-red-600';
@@ -74,12 +99,7 @@ function NotificationDropdown() {
 
   return (
     <div className="dropdown dropdown-end">
-      <button
-        tabIndex={0}
-        role="button"
-        className="btn btn-ghost btn-circle relative"
-        onClick={() => setIsOpen(!isOpen)}
-      >
+      <label tabIndex={0} className="btn btn-ghost btn-circle relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-6 w-6"
@@ -99,13 +119,12 @@ function NotificationDropdown() {
             {unreadCountNum > 9 ? '9+' : unreadCountNum}
           </span>
         )}
-      </button>
+      </label>
 
-      {isOpen && (
-        <div
-          tabIndex={0}
-          className="menu dropdown-content z-[1] mt-3 w-80 rounded-box bg-base-100 p-2 shadow-lg"
-        >
+      <div
+        tabIndex={0}
+        className="dropdown-content menu z-[1] mt-3 w-80 rounded-box bg-base-100 p-2 shadow-lg"
+      >
           <div className="flex items-center justify-between border-b pb-2 mb-2">
             <h3 className="text-lg font-bold">اعلان‌ها</h3>
             {unreadCountNum > 0 && (
@@ -146,7 +165,8 @@ function NotificationDropdown() {
                 {notifications.map((notification: Notification) => (
                   <div
                     key={notification.id}
-                    className={`p-3 rounded-lg border border-base-300 hover:bg-base-200 transition-colors ${
+                    onClick={(e) => handleNotificationClick(notification, e)}
+                    className={`p-3 rounded-lg border border-base-300 hover:bg-base-200 transition-colors cursor-pointer ${
                       !notification.read_at ? 'bg-primary/5' : ''
                     }`}
                   >
@@ -212,8 +232,7 @@ function NotificationDropdown() {
               </div>
             )}
           </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
