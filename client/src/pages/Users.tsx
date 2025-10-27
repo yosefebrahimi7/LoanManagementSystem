@@ -76,8 +76,10 @@ function Users() {
                     </td>
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-content font-bold shadow">
-                          {user.firstName?.charAt(0)}
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary grid place-items-center text-primary-content font-bold shadow">
+                          <span style={{ lineHeight: 1, margin: 0, padding: 0 }}>
+                            {user.firstName?.charAt(0)}
+                          </span>
                         </div>
                         <div>
                           <div className="font-semibold">

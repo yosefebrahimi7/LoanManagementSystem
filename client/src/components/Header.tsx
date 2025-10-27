@@ -117,8 +117,8 @@ export default function Header() {
             {/* User Dropdown */}
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                <div className="w-8 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                  <span className="text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-content relative">
+                  <span className="text-xs font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ lineHeight: 1 }}>
                     {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                   </span>
                 </div>

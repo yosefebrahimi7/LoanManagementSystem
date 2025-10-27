@@ -8,8 +8,10 @@ function Profile() {
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <div className="flex items-center gap-6 mb-6 pb-6 border-b border-base-300">
-            <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-content text-3xl font-bold shadow-xl">
-              {user?.firstName?.charAt(0)}
+            <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-secondary grid place-items-center text-primary-content text-3xl font-bold shadow-xl">
+              <span style={{ lineHeight: 1, margin: 0, padding: 0 }}>
+                {user?.firstName?.charAt(0)}
+              </span>
             </div>
             <div>
               <h1 className="text-3xl font-bold">
