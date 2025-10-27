@@ -33,11 +33,17 @@ A production-ready Loan Management System built with Laravel that allows users t
 
 ## Documentation
 
-- [Installation Guide](installation.md)
-- [API Documentation](api-documentation.md)
-- [Database Design](database-design.md)
-- [Configuration](configuration.md)
-- [Development Guide](development.md)
+- [Overview](readme.md) - نمای کلی
+- [API Documentation](api-readme.md) - راهنمای کامل API
+- [System Overview](system-overview.md) - نمای کلی سیستم
+- [Features Summary](feature-summary.md) - خلاصه ویژگی‌ها
+- [Installation Guide](installation.md) - نصب و راه‌اندازی
+- [Configuration](configuration.md) - تنظیمات
+- [Database Design](database-design.md) - طراحی دیتابیس
+- [Development Guide](development.md) - راهنمای توسعه
+- [Payment Integration](payment-integration.md) - سیستم پرداخت
+- [Payment Test Guide](payment-test-guide.md) - راهنمای تست پرداخت
+- [Environment Template](env.template) - نمونه تنظیمات
 
 ## License
 
