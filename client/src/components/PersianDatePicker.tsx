@@ -1,44 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { DayPicker } from "react-day-picker";
-import { faIR } from "date-fns-jalali/locale";
 import moment from "moment-jalaali";
-import "react-day-picker/style.css";
-
-// Custom Persian locale with full names
-const persianLocale: any = {
-  ...faIR,
-  localize: {
-    ...faIR.localize,
-    month: (monthIndex: number) => {
-      const months = [
-        "فروردین",
-        "اردیبهشت",
-        "خرداد",
-        "تیر",
-        "مرداد",
-        "شهریور",
-        "مهر",
-        "آبان",
-        "آذر",
-        "دی",
-        "بهمن",
-        "اسفند",
-      ];
-      return months[monthIndex];
-    },
-    day: (dayIndex: number) => {
-      const days = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
-      return days[dayIndex];
-    },
-  },
-  formatLong: {
-    ...faIR.formatLong,
-  },
-  options: {
-    ...faIR.options,
-    weekStartsOn: 7, // Saturday (شنبه)
-  },
-};
 
 interface PersianDatePickerProps {
   value: string;
@@ -57,15 +18,32 @@ export default function PersianDatePicker({
 }: PersianDatePickerProps) {
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    value ? moment(value, "YYYY-MM-DD").toDate() : undefined
-  );
+  const [calendar, setCalendar] = useState<{
+    year: number;
+    month: number;
+  }>({
+    year: moment().jYear(),
+    month: moment().jMonth() + 1,
+  });
+  const [selectedDate, setSelectedDate] = useState<{
+    year: number;
+    month: number;
+    day: number;
+  } | null>(null);
 
   useEffect(() => {
     if (value) {
       const m = moment(value, "YYYY-MM-DD");
       if (m.isValid()) {
-        setSelectedDate(m.toDate());
+        setSelectedDate({
+          year: m.jYear(),
+          month: m.jMonth() + 1,
+          day: m.jDate(),
+        });
+        setCalendar({
+          year: m.jYear(),
+          month: m.jMonth() + 1,
+        });
       }
     }
   }, [value]);
@@ -84,61 +62,100 @@ export default function PersianDatePicker({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      // Convert to Gregorian format for server
-      const gregorianDate = moment(date).format("YYYY-MM-DD");
-      onChange(gregorianDate);
-    } else {
-      onChange("");
+  const getMonthDays = () => {
+    const daysInMonth = moment.jDaysInMonth(calendar.year, calendar.month);
+    const monthStartDay = moment(
+      `${calendar.year}/${calendar.month}/1`,
+      "jYYYY/jMM/jDD"
+    ).day();
+
+    const days = [];
+
+    for (let i = 0; i < monthStartDay; i++) {
+      days.push(null);
     }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(day);
+    }
+
+    return days;
+  };
+
+  const handleDayClick = (day: number) => {
+    const newSelectedDate = {
+      year: calendar.year,
+      month: calendar.month,
+      day,
+    };
+
+    const jalaliMoment = moment(
+      `${calendar.year}/${calendar.month}/${day}`,
+      "jYYYY/jMM/jDD"
+    );
+    const gregorianDate = jalaliMoment.format("YYYY-MM-DD");
+
+    if (minDate && gregorianDate < minDate) {
+      return;
+    }
+
+    setSelectedDate(newSelectedDate);
+    onChange(gregorianDate);
     setShowPicker(false);
   };
 
-  const getDisplayValue = () => {
-    if (!selectedDate) return "";
-
-    const m = moment(selectedDate);
-    const monthNames = [
-      "فروردین",
-      "اردیبهشت",
-      "خرداد",
-      "تیر",
-      "مرداد",
-      "شهریور",
-      "مهر",
-      "آبان",
-      "آذر",
-      "دی",
-      "بهمن",
-      "اسفند",
-    ];
-
-    const day = m.jDate();
-    const month = m.jMonth();
-    const year = m.jYear();
-
-    // Convert numbers to Persian digits
-    const toPersianDigits = (num: number) => {
-      const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-      return num
-        .toString()
-        .split("")
-        .map((d) => persianDigits[parseInt(d)])
-        .join("");
-    };
-
-    return `${toPersianDigits(day)} ${monthNames[month]} ${toPersianDigits(
-      year
-    )}`;
+  const navigateMonth = (direction: "prev" | "next") => {
+    setCalendar((prev) => {
+      if (direction === "prev") {
+        if (prev.month === 1) {
+          return { year: prev.year - 1, month: 12 };
+        }
+        return { year: prev.year, month: prev.month - 1 };
+      } else {
+        if (prev.month === 12) {
+          return { year: prev.year + 1, month: 1 };
+        }
+        return { year: prev.year, month: prev.month + 1 };
+      }
+    });
   };
 
-  const displayValue = getDisplayValue();
+  const monthNames = [
+    "فروردین",
+    "اردیبهشت",
+    "خرداد",
+    "تیر",
+    "مرداد",
+    "شهریور",
+    "مهر",
+    "آبان",
+    "آذر",
+    "دی",
+    "بهمن",
+    "اسفند",
+  ];
 
-  const minDateObj = minDate
-    ? moment(minDate, "YYYY-MM-DD").toDate()
-    : undefined;
+  const weekDays = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
+
+  const displayValue = selectedDate
+    ? `${selectedDate.day} ${monthNames[selectedDate.month - 1]} ${selectedDate.year}`
+    : "";
+
+  const isDateDisabled = (day: number) => {
+    if (!minDate) return false;
+    const jalaliMoment = moment(
+      `${calendar.year}/${calendar.month}/${day}`,
+      "jYYYY/jMM/jDD"
+    );
+    const gregorianDate = jalaliMoment.format("YYYY-MM-DD");
+    return gregorianDate < minDate;
+  };
+
+  const days = getMonthDays();
+  const rows = [];
+  for (let i = 0; i < days.length; i += 7) {
+    rows.push(days.slice(i, i + 7));
+  }
 
   return (
     <div className={`relative w-full ${className}`} ref={pickerRef}>
@@ -152,16 +169,94 @@ export default function PersianDatePicker({
       />
 
       {showPicker && (
-        <div className="absolute bottom-full left-0 mb-2 bg-base-100 border-2 border-base-300 rounded-lg shadow-lg p-4 z-50">
-          <div className="react-day-picker rtl">
-            <DayPicker
-              mode="single"
-              selected={selectedDate}
-              onSelect={handleSelect}
-              locale={persianLocale}
-              className="rdp"
-              dir="rtl"
-            />
+        <div className="absolute bottom-full left-0 mb-2 bg-base-100 border-2 border-base-300 rounded-lg shadow-lg p-4 z-50 w-80 rtl">
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={() => navigateMonth("next")}
+              className="btn btn-sm btn-circle btn-ghost"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <span className="font-bold text-lg">
+              {monthNames[calendar.month - 1]} {calendar.year}
+            </span>
+            <button
+              type="button"
+              onClick={() => navigateMonth("prev")}
+              className="btn btn-sm btn-circle btn-ghost"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {weekDays.map((day) => (
+              <div
+                key={day}
+                className="text-center text-sm font-bold opacity-70 py-1"
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-1">
+            {rows.map((row, rowIndex) =>
+              row.map((day, dayIndex) => {
+                if (day === null) {
+                  return <div key={`${rowIndex}-${dayIndex}`}></div>;
+                }
+
+                const isSelected =
+                  selectedDate &&
+                  selectedDate.year === calendar.year &&
+                  selectedDate.month === calendar.month &&
+                  selectedDate.day === day;
+
+                const disabled = isDateDisabled(day);
+
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => !disabled && handleDayClick(day)}
+                    disabled={disabled}
+                    className={`
+                      btn btn-sm btn-circle
+                      ${isSelected ? "btn-primary" : "btn-ghost"}
+                      ${disabled ? "text-base-content/30 cursor-not-allowed" : ""}
+                    `}
+                  >
+                    {day}
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
       )}
