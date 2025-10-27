@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
  * )
  * 
  * @OA\Server(
- *   url=L5_SWAGGER_CONST_HOST,
+ *   url="http://localhost:8000",
  *   description="API Server"
  * )
  * 
