@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\LoanApproved;
 use App\Events\LoanRejected;
+use App\Events\LoanRequested;
 use App\Exceptions\LoanException;
 use App\Models\Loan;
 use App\Models\LoanSchedule;
@@ -44,6 +45,9 @@ class LoanService
                 'status' => Loan::STATUS_PENDING,
                 'start_date' => $data['start_date'],
             ]);
+
+            // Fire loan requested event to notify admins
+            event(new LoanRequested($loan));
 
             return $loan;
         });

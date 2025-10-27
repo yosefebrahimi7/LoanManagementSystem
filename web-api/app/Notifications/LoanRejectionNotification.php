@@ -59,7 +59,8 @@ class LoanRejectionNotification extends Notification implements ShouldQueue
             'loan_id' => $this->loan->id,
             'amount' => $this->loan->amount,
             'rejection_reason' => $this->loan->rejection_reason,
-            'message' => 'Your loan application has been rejected.',
+            'message' => 'درخواست وام شما رد شد',
+            'type' => 'loan_rejected',
         ];
     }
 }

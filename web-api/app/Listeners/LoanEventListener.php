@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\LoanApproved;
 use App\Events\LoanRejected;
+use App\Events\LoanRequested;
 use App\Events\InstallmentPaid;
 use App\Jobs\SendLoanApprovalNotificationJob;
 use App\Jobs\SendLoanRejectionNotificationJob;
@@ -14,6 +15,15 @@ use Illuminate\Queue\InteractsWithQueue;
 class LoanEventListener implements ShouldQueue
 {
     use InteractsWithQueue;
+
+    /**
+     * Handle loan requested event
+     */
+    public function handleLoanRequested(LoanRequested $event): void
+    {
+        // This is handled by SendLoanRequestNotificationToAdmins listener
+        // No additional action needed here
+    }
 
     /**
      * Handle loan approved event

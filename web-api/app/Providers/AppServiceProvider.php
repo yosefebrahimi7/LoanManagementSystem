@@ -17,6 +17,8 @@ use App\Services\Interfaces\PaymentServiceInterface;
 use App\Services\PaymentService;
 use App\Services\Interfaces\UserServiceInterface;
 use App\Services\UserService;
+use App\Services\Interfaces\NotificationServiceInterface;
+use App\Services\NotificationService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
         $this->app->bind(PaymentServiceInterface::class, PaymentService::class);
         $this->app->bind(UserServiceInterface::class, UserService::class);
+        $this->app->bind(NotificationServiceInterface::class, NotificationService::class);
     }
 
     /**
@@ -44,6 +47,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register Policies
         $this->registerPolicies();
+        
+        // Register Event Listeners
+        $this->registerEventListeners();
     }
 
     /**
@@ -59,5 +65,25 @@ class AppServiceProvider extends ServiceProvider
         
         // Loan Policies
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Loan::class, \App\Policies\LoanPolicy::class);
+        
+        // Notification Policies
+        \Illuminate\Support\Facades\Gate::policy(
+            \Illuminate\Notifications\DatabaseNotification::class,
+            \App\Policies\NotificationPolicy::class
+        );
+    }
+
+    /**
+     * Register event listeners.
+     */
+    protected function registerEventListeners(): void
+    {
+        $events = app('events');
+
+        // Register loan requested event
+        $events->listen(
+            \App\Events\LoanRequested::class,
+            \App\Listeners\SendLoanRequestNotificationToAdmins::class
+        );
     }
 }

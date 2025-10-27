@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LoanController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Resources\LoanResource;
@@ -65,6 +66,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [PaymentController::class, 'paymentHistory']);
         Route::get('/status/{payment}', [PaymentController::class, 'paymentStatus']);
         Route::post('/loans/{loan}/initiate', [PaymentController::class, 'initiatePayment']);
+    });
+
+    // Notification routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
 
     // Example of using API Resources directly in routes

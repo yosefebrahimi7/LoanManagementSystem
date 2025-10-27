@@ -64,7 +64,8 @@ class PaymentConfirmationNotification extends Notification implements ShouldQueu
             'principal_amount' => $this->installment->principal_amount,
             'interest_amount' => $this->installment->interest_amount,
             'paid_at' => $this->installment->paid_at,
-            'message' => 'Your payment has been successfully processed.',
+            'message' => 'پرداخت شما با موفقیت انجام شد',
+            'type' => 'payment_confirmed',
         ];
     }
 }

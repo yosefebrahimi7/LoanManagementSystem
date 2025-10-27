@@ -62,7 +62,8 @@ class LoanApprovalNotification extends Notification implements ShouldQueue
             'monthly_payment' => $this->loan->monthly_payment,
             'term_months' => $this->loan->term_months,
             'interest_rate' => $this->loan->interest_rate,
-            'message' => 'Your loan application has been approved.',
+            'message' => 'درخواست وام شما تایید شد',
+            'type' => 'loan_approved',
         ];
     }
 }
