@@ -4,8 +4,17 @@ namespace App\Providers;
 
 use App\Events\LoanApproved;
 use App\Events\LoanRejected;
+use App\Events\LoanRequested;
 use App\Events\InstallmentPaid;
+use App\Events\PaymentFailed;
+use App\Events\LoanFullyPaid;
+use App\Events\UserRegistered;
 use App\Listeners\LoanEventListener;
+use App\Listeners\SendLoanRequestNotificationToAdmins;
+use App\Listeners\SendUserRegistrationNotificationToAdmins;
+use App\Listeners\SendPaymentFailedNotification;
+use App\Listeners\SendLoanFullyPaidNotification;
+use App\Listeners\SendInstallmentPaidNotificationToAdmins;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,7 +32,16 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         
+        // User registration event
+        UserRegistered::class => [
+            SendUserRegistrationNotificationToAdmins::class,
+        ],
+        
         // Loan events
+        LoanRequested::class => [
+            SendLoanRequestNotificationToAdmins::class,
+        ],
+        
         LoanApproved::class => [
             [LoanEventListener::class, 'handleLoanApproved'],
         ],
@@ -34,6 +52,15 @@ class EventServiceProvider extends ServiceProvider
         
         InstallmentPaid::class => [
             [LoanEventListener::class, 'handleInstallmentPaid'],
+            SendInstallmentPaidNotificationToAdmins::class,
+        ],
+        
+        PaymentFailed::class => [
+            SendPaymentFailedNotification::class,
+        ],
+        
+        LoanFullyPaid::class => [
+            SendLoanFullyPaidNotification::class,
         ],
     ];
 

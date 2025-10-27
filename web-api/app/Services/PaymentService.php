@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Events\PaymentFailed;
+use App\Events\InstallmentPaid;
+use App\Events\LoanFullyPaid;
 use App\Models\Loan;
 use App\Models\LoanPayment;
 use App\Models\LoanSchedule;
@@ -194,6 +197,10 @@ class PaymentService implements PaymentServiceInterface
             $schedule = $payment->loan_schedule_id ? LoanSchedule::find($payment->loan_schedule_id) : null;
             $loan = Loan::find($payment->loan_id);
 
+            // Track if schedule was fully paid
+            $wasScheduleFullyPaid = false;
+            $wasLoanFullyPaid = false;
+
             // Update schedule if exists
             if ($schedule) {
                 $newPaidAmount = $schedule->paid_amount + $payment->amount;
@@ -206,6 +213,7 @@ class PaymentService implements PaymentServiceInterface
                 // Update schedule status
                 if ($newPaidAmount >= $schedule->amount_due) {
                     $schedule->update(['status' => LoanSchedule::STATUS_PAID]);
+                    $wasScheduleFullyPaid = true;
                 } else {
                     $schedule->update(['status' => LoanSchedule::STATUS_PARTIAL]);
                 }
@@ -228,6 +236,7 @@ class PaymentService implements PaymentServiceInterface
                 // Check if loan is fully paid
                 if ($newRemaining <= 0 && $loan->status === Loan::STATUS_ACTIVE) {
                     $loan->update(['status' => Loan::STATUS_PAID]);
+                    $wasLoanFullyPaid = true;
                 }
                 
                 Log::info('Loan updated', [
@@ -238,6 +247,17 @@ class PaymentService implements PaymentServiceInterface
             }
 
             DB::commit();
+
+            // Fire events after successful commit
+            if ($wasScheduleFullyPaid && $schedule) {
+                $schedule->load('loan.user');
+                event(new InstallmentPaid($schedule));
+            }
+
+            if ($wasLoanFullyPaid && $loan) {
+                $loan->load('user');
+                event(new LoanFullyPaid($loan));
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -258,6 +278,10 @@ class PaymentService implements PaymentServiceInterface
             'status' => LoanPayment::STATUS_FAILED,
             'notes' => $reason,
         ]);
+
+        // Load relationships and fire payment failed event
+        $payment->load(['user', 'loan', 'schedule']);
+        event(new PaymentFailed($payment));
     }
 
     /**

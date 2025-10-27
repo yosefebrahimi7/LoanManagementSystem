@@ -14,3 +14,10 @@ Schedule::command('loans:process-penalties')
     ->at('00:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Schedule due date reminders daily
+Schedule::command('loans:send-reminders')
+    ->daily()
+    ->at('08:00')
+    ->withoutOverlapping()
+    ->runInBackground();
