@@ -210,6 +210,7 @@ export default function LoanRequest() {
                         <th>مدت</th>
                         <th>نرخ بهره</th>
                         <th>تاریخ درخواست</th>
+                        <th>تاریخ شروع</th>
                         <th>وضعیت</th>
                         <th>عملیات</th>
                       </tr>
@@ -226,6 +227,9 @@ export default function LoanRequest() {
                             <td>{loan.interest_rate}%</td>
                             <td>
                               {new Date(loan.created_at).toLocaleDateString('fa-IR')}
+                            </td>
+                            <td>
+                              {new Date(loan.start_date).toLocaleDateString('fa-IR')}
                             </td>
                             <td>
                               <span className={`badge ${status.class}`}>
