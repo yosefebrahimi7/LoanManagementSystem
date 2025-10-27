@@ -121,19 +121,17 @@ export default function PersianDatePicker({
       />
       
       {showPicker && (
-        <div className="absolute bottom-full left-0 mb-2 bg-base-100 border-2 border-base-300 rounded-lg shadow-lg p-4 z-50 rtl">
-          <DayPicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleSelect}
-            locale={persianLocale}
-            // captionLayout="dropdown-buttons"
-            fromYear={1400}
-            toYear={1420}
-            fromDate={minDateObj}
-            className="rdp"
-            dir="rtl"
-          />
+        <div className="absolute bottom-full left-0 mb-2 bg-base-100 border-2 border-base-300 rounded-lg shadow-lg p-4 z-50">
+          <div className="react-day-picker rtl">
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleSelect}
+              locale={persianLocale}
+              className="rdp"
+              dir="rtl"
+            />
+          </div>
         </div>
       )}
     </div>
