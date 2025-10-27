@@ -17,20 +17,36 @@ class LoanSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create settings
-        $this->createSettings();
+        // Get existing admin user
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
         
-        // Create admin user
-        $admin = $this->createAdminUser();
+        // Get existing regular users (limit to 2)
+        $users = User::where('role', User::ROLE_USER)
+            ->limit(2)
+            ->get()
+            ->toArray();
         
-        // Create regular users
-        $users = $this->createRegularUsers();
+        // Create wallets for users if they don't exist
+        if ($admin) {
+            $this->createWalletForUser($admin);
+        }
+        foreach ($users as $user) {
+            $userModel = User::find($user['id']);
+            if ($userModel) {
+                $this->createWalletForUser($userModel);
+            }
+        }
         
-        // Create wallets for users
-        $this->createWallets($users);
-        
-        // Create loans at various stages
-        $this->createLoansAtVariousStages($users, $admin);
+        // Only create loans if we have enough users
+        if (count($users) >= 2 && $admin) {
+            // Convert array users to models
+            $userModels = array_map(function($user) {
+                return User::find($user['id']);
+            }, $users);
+            
+            // Create loans at various stages (simplified for 2 users)
+            $this->createLoansForLimitedUsers($userModels, $admin);
+        }
     }
 
     private function createSettings(): void
@@ -66,122 +82,45 @@ class LoanSeeder extends Seeder
         }
     }
 
-    private function createAdminUser(): User
+    private function createWalletForUser(User $user): void
     {
-        return User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+        Wallet::firstOrCreate(
+            ['user_id' => $user->id],
             [
-                'first_name' => 'Admin',
-                'last_name' => 'User',
-                'email' => 'admin@example.com',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'role' => User::ROLE_ADMIN,
+                'user_id' => $user->id,
+                'balance' => rand(0, 5000000), // 0 to 50M IRR
+                'currency' => 'IRR',
             ]
         );
     }
 
-    private function createRegularUsers(): array
+    private function createLoansForLimitedUsers(array $users, User $admin): void
     {
-        $users = [];
-        
-        // Always create demo users to ensure we have enough users for loans
-        for ($i = 1; $i <= 10; $i++) {
-            $email = "user{$i}@example.com";
-            $users[] = User::firstOrCreate(
-                ['email' => $email],
-                [
-                    'first_name' => "User{$i}",
-                    'last_name' => "LastName{$i}",
-                    'email' => $email,
-                    'password' => Hash::make('password'),
-                    'is_active' => true,
-                    'role' => User::ROLE_USER,
-                ]
-            );
-        }
-        
-        return $users;
-    }
-
-    private function createWallets(array $users): void
-    {
-        foreach ($users as $user) {
-            Wallet::firstOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'user_id' => $user->id,
-                    'balance' => rand(0, 5000000), // 0 to 50M IRR
-                    'currency' => 'IRR',
-                ]
-            );
-        }
-    }
-
-    private function createLoansAtVariousStages(array $users, User $admin): void
-    {
-        // Check if loans already exist for these users
-        $existingLoans = Loan::whereIn('user_id', collect($users)->pluck('id'))->count();
+        // Check if loans already exist
+        $existingLoans = Loan::count();
         
         if ($existingLoans > 0) {
             // Loans already exist, skip creation
             return;
         }
 
-        // Create pending loans (5)
-        for ($i = 0; $i < 5; $i++) {
-            $loan = Loan::factory()->pending()->create([
-                'user_id' => $users[$i]->id,
-            ]);
-        }
+        // Create 1 pending loan for first user
+        Loan::factory()->pending()->create([
+            'user_id' => $users[0]->id,
+        ]);
 
-        // Create approved loans (3)
-        for ($i = 0; $i < 3; $i++) {
-            $loan = Loan::factory()->approved()->create([
-                'user_id' => $users[$i + 5]->id,
-                'approved_by' => $admin->id,
-            ]);
-            
-            // Generate payment schedules for approved loans
-            $this->generatePaymentSchedule($loan);
-        }
-
-        // Create active loans (2)
-        for ($i = 0; $i < 2; $i++) {
-            $loan = Loan::factory()->active()->create([
-                'user_id' => $users[$i + 8]->id,
-                'approved_by' => $admin->id,
-            ]);
-            
-            // Generate payment schedules for active loans
-            $this->generatePaymentSchedule($loan);
-        }
-
-        // Create rejected loans (2)
-        for ($i = 0; $i < 2; $i++) {
-            Loan::factory()->rejected()->create([
-                'user_id' => $users[$i]->id,
-                'approved_by' => $admin->id,
-                'rejection_reason' => 'Insufficient credit history',
-            ]);
-        }
-
-        // Create delinquent loans (1)
-        $loan = Loan::factory()->delinquent()->create([
-            'user_id' => $users[9]->id,
+        // Create 1 approved loan for second user
+        $loan = Loan::factory()->approved()->create([
+            'user_id' => $users[1]->id,
             'approved_by' => $admin->id,
         ]);
-        
-        // Generate payment schedules for delinquent loan
         $this->generatePaymentSchedule($loan);
-        
-        // Create paid loans (1)
-        $loan = Loan::factory()->paid()->create([
+
+        // Create 1 active loan for first user
+        $loan = Loan::factory()->active()->create([
             'user_id' => $users[0]->id,
             'approved_by' => $admin->id,
         ]);
-        
-        // Generate payment schedules for paid loan
         $this->generatePaymentSchedule($loan);
     }
 

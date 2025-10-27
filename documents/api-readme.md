@@ -259,7 +259,10 @@ app/
 بعد از اجرای `php artisan db:seed`:
 
 - **Admin**: `admin@example.com` / `password`
-- **User**: `user@example.com` / `password`
+- **User 1**: `test1@example.com` / `password`
+- **User 2**: `test2@example.com` / `password`
+
+**مجموع:** 1 ادمین + 2 کاربر
 
 ---
 

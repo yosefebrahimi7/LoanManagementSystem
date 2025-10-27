@@ -50,15 +50,23 @@ npm run dev
 
 ## Seeded Accounts
 
+After running migrations and seeders, the following accounts are created:
+
 ### Admin Account
 - **Email:** `admin@example.com`
 - **Password:** `password`
+- **Role:** Admin
 
 ### User Accounts
-- **Email:** `user@example.com`
+- **Email:** `test1@example.com`
 - **Password:** `password`
-- **Email:** `jane@example.com`
+- **Role:** User
+
+- **Email:** `test2@example.com`
 - **Password:** `password`
+- **Role:** User
+
+**Total:** 1 Admin + 2 Users
 
 ## Running Tests
 
