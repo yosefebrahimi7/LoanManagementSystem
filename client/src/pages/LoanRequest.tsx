@@ -4,6 +4,7 @@ import { useCreateLoan, useUserLoans } from "../hooks/useLoans";
 import type { LoanRequestDto } from "../types";
 import { getLoanStatusBadge } from "../utils/loanStatus";
 import { formatAmountToPersianWords } from "../utils/numberUtils";
+import PersianDatePicker from "../components/PersianDatePicker";
 
 interface LoanFormData {
   amount: string;
@@ -148,14 +149,14 @@ export default function LoanRequest() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       تاریخ شروع
                     </label>
-                    <input
-                      type="date"
-                      name="start_date"
+                    <PersianDatePicker
                       value={formData.start_date}
-                      onChange={handleInputChange}
-                      required
-                      min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={(date) => {
+                        setFormData(prev => ({ ...prev, start_date: date }));
+                      }}
+                      minDate={new Date().toISOString().split('T')[0]}
+                      placeholder="تاریخ را انتخاب کنید"
+                      className="w-full"
                     />
                   </div>
 

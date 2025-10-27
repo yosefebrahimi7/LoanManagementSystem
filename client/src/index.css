@@ -12,3 +12,9 @@
 body {
   font-family: 'YekanBakh', sans-serif;
 }
+
+/* react-day-picker minimal styles */
+.rdp {
+  --rdp-cell-size: 40px;
+  margin: 0;
+}
