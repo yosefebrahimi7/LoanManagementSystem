@@ -43,7 +43,9 @@ class LoanScheduleFactory extends Factory
         ];
         
         $status = $this->faker->randomElement($statuses);
-        $dueDate = $loan->start_date->addMonths($installmentNumber);
+        
+        // Use a safe date range: start_date + months (don't modify original date)
+        $dueDate = \Carbon\Carbon::parse($loan->start_date)->addMonths($installmentNumber);
         
         return [
             'loan_id' => $loan->id,
@@ -53,8 +55,10 @@ class LoanScheduleFactory extends Factory
             'interest_amount' => $interestAmount,
             'due_date' => $dueDate,
             'status' => $status,
-            'paid_at' => $status === LoanSchedule::STATUS_PAID ? $this->faker->dateTimeBetween($dueDate, 'now') : null,
-            'penalty_amount' => $status === LoanSchedule::STATUS_OVERDUE ? $this->faker->numberBetween(10000, 100000) : 0,
+            'paid_at' => $status === LoanSchedule::STATUS_PAID ? 
+                $this->faker->dateTimeBetween('-1 month', 'now') : null,
+            'penalty_amount' => $status === LoanSchedule::STATUS_OVERDUE ? 
+                $this->faker->numberBetween(10000, 100000) : 0,
         ];
     }
 
@@ -75,11 +79,17 @@ class LoanScheduleFactory extends Factory
      */
     public function paid(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => LoanSchedule::STATUS_PAID,
-            'paid_at' => $this->faker->dateTimeBetween($attributes['due_date'], 'now'),
-            'penalty_amount' => 0,
-        ]);
+        return $this->state(function (array $attributes) {
+            $dueDate = \Carbon\Carbon::parse($attributes['due_date'] ?? now());
+            return [
+                'status' => LoanSchedule::STATUS_PAID,
+                'paid_at' => $this->faker->dateTimeBetween(
+                    max($dueDate->subMonths(1), now()->subMonths(1)),
+                    'now'
+                ),
+                'penalty_amount' => 0,
+            ];
+        });
     }
 
     /**

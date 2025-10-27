@@ -14,6 +14,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * @OA\Tag(
+ *   name="Loans",
+ *   description="Loan management endpoints"
+ * )
+ */
 class LoanController extends Controller
 {
     public function __construct(
@@ -23,6 +29,22 @@ class LoanController extends Controller
 
     /**
      * Get user's loans
+     * 
+     * @OA\Get(
+     *   path="/api/loans",
+     *   tags={"Loans"},
+     *   summary="Get user's loans",
+     *   operationId="getUserLoans",
+     *   security={{"sanctum": {}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="List of user loans",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *     )
+     *   )
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -45,6 +67,33 @@ class LoanController extends Controller
 
     /**
      * Create a new loan request
+     * 
+     * @OA\Post(
+     *   path="/api/loans",
+     *   tags={"Loans"},
+     *   summary="Create loan request",
+     *   operationId="createLoan",
+     *   security={{"sanctum": {}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"amount", "term_months", "start_date"},
+     *       @OA\Property(property="amount", type="integer", example=10000000),
+     *       @OA\Property(property="term_months", type="integer", example=12),
+     *       @OA\Property(property="interest_rate", type="number", format="float", example=14.5),
+     *       @OA\Property(property="start_date", type="string", format="date", example="2025-11-01")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=201,
+     *     description="Loan request created",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="message", type="string"),
+     *       @OA\Property(property="data", type="object")
+     *     )
+     *   )
+     * )
      */
     public function store(LoanRequest $request): JsonResponse
     {
@@ -64,6 +113,29 @@ class LoanController extends Controller
 
     /**
      * Get specific loan details
+     * 
+     * @OA\Get(
+     *   path="/api/loans/{id}",
+     *   tags={"Loans"},
+     *   summary="Get loan details",
+     *   operationId="getLoan",
+     *   security={{"sanctum": {}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Loan details",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="data", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=404, description="Loan not found")
+     * )
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -108,6 +180,39 @@ class LoanController extends Controller
 
     /**
      * Approve or reject a loan (Admin only)
+     * 
+     * @OA\Post(
+     *   path="/api/admin/loans/{id}/approve",
+     *   tags={"Loans", "Admin"},
+     *   summary="Approve or reject loan",
+     *   operationId="approveLoan",
+     *   security={{"sanctum": {}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"action"},
+     *       @OA\Property(property="action", type="string", enum={"approve", "reject"}, example="approve"),
+     *       @OA\Property(property="rejection_reason", type="string")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Loan processed successfully",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="message", type="string"),
+     *       @OA\Property(property="data", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Unauthorized"),
+     *   @OA\Response(response=404, description="Loan not found")
+     * )
      */
     public function approve(LoanApprovalRequest $request, int $id): JsonResponse
     {

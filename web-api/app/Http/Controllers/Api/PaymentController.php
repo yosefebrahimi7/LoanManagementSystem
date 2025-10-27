@@ -15,6 +15,12 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @OA\Tag(
+ *   name="Payments",
+ *   description="Payment management endpoints"
+ * )
+ */
 class PaymentController extends Controller
 {
     use ApiResponseTrait, AuthorizesRequests;
@@ -25,6 +31,36 @@ class PaymentController extends Controller
 
     /**
      * Initialize payment for a loan installment
+     * 
+     * @OA\Post(
+     *   path="/api/payment/loans/{loan}/initiate",
+     *   tags={"Payments"},
+     *   summary="Initiate payment for loan installment",
+     *   operationId="initiatePayment",
+     *   security={{"sanctum": {}}},
+     *   @OA\Parameter(
+     *     name="loan",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"schedule_id"},
+     *       @OA\Property(property="schedule_id", type="integer", example=1),
+     *       @OA\Property(property="amount", type="integer", example=1000000)
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Payment initiated",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="authority", type="string"),
+     *       @OA\Property(property="payment_url", type="string", format="url")
+     *     )
+     *   )
+     * )
      */
     public function initiatePayment(PaymentRequest $request, Loan $loan): JsonResponse
     {
@@ -74,6 +110,25 @@ class PaymentController extends Controller
 
     /**
      * Handle callback from payment gateway
+     * 
+     * @OA\Post(
+     *   path="/api/payment/callback",
+     *   tags={"Payments"},
+     *   summary="Payment gateway callback",
+     *   operationId="paymentCallback",
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="Authority", type="string"),
+     *       @OA\Property(property="Status", type="string")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Payment processed",
+     *     @OA\JsonContent(type="object")
+     *   )
+     * )
      */
     public function callback(PaymentCallbackRequest $request): mixed
     {
@@ -97,6 +152,25 @@ class PaymentController extends Controller
 
     /**
      * Get payment status
+     * 
+     * @OA\Get(
+     *   path="/api/payment/status/{payment}",
+     *   tags={"Payments"},
+     *   summary="Get payment status",
+     *   operationId="getPaymentStatus",
+     *   security={{"sanctum": {}}},
+     *   @OA\Parameter(
+     *     name="payment",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Payment status",
+     *     @OA\JsonContent(type="object")
+     *   )
+     * )
      */
     public function paymentStatus(LoanPayment $payment): JsonResponse
     {
@@ -129,6 +203,24 @@ class PaymentController extends Controller
 
     /**
      * Get user's payment history
+     * 
+     * @OA\Get(
+     *   path="/api/payment/history",
+     *   tags={"Payments"},
+     *   summary="Get payment history",
+     *   operationId="getPaymentHistory",
+     *   security={{"sanctum": {}}},
+     *   @OA\Parameter(
+     *     name="per_page",
+     *     in="query",
+     *     @OA\Schema(type="integer", default=20)
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Payment history",
+     *     @OA\JsonContent(type="object")
+     *   )
+     * )
      */
     public function paymentHistory(PaymentHistoryRequest $request): JsonResponse
     {
