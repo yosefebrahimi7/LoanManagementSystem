@@ -32,7 +32,7 @@ export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (notificationId: number) => {
+    mutationFn: async (notificationId: string) => {
       const response = await appHttp.patch(`/notifications/${notificationId}/read`);
       return response.data.data;
     },
@@ -71,7 +71,7 @@ export const useDeleteNotification = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (notificationId: number) => {
+    mutationFn: async (notificationId: string) => {
       const response = await appHttp.delete(`/notifications/${notificationId}`);
       return response.data.data;
     },

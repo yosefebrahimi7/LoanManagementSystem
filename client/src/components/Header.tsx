@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router";
 import useAuth from "../stores/auth";
 import { useLogout } from "../hooks/useAuth";
+import NotificationDropdown from "./NotificationDropdown";
 
 interface BreadcrumbItem {
   label: string;
@@ -113,6 +114,9 @@ export default function Header() {
                 </button>
               )}
             </div>
+
+            {/* Notification Dropdown */}
+            <NotificationDropdown />
 
             {/* User Dropdown */}
             <div className="dropdown dropdown-end">

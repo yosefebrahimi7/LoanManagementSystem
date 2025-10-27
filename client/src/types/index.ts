@@ -111,3 +111,17 @@ export interface LoanApprovalDto {
   rejection_reason?: string;
 }
 
+export interface Notification {
+  id: string;
+  type: string;
+  data: {
+    message?: string;
+    type?: string;
+    loan_id?: number;
+    user_id?: number;
+    [key: string]: any;
+  };
+  read_at: string | null;
+  created_at: string;
+}
+
