@@ -7,8 +7,8 @@ export const useUsers = () => {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const { data } = await appHttp.get<User[]>('/users');
-      return data;
+      const { data } = await appHttp.get<{ data: User[] }>('/users');
+      return data.data;
     },
   });
 };
@@ -17,8 +17,8 @@ export const useUser = (id: number) => {
   return useQuery({
     queryKey: ['user', id],
     queryFn: async () => {
-      const { data } = await appHttp.get<User>(`/users/${id}`);
-      return data;
+      const { data } = await appHttp.get<{ data: User }>(`/users/${id}`);
+      return data.data;
     },
     enabled: !!id,
   });
@@ -29,8 +29,8 @@ export const useCreateUser = () => {
 
   return useMutation({
     mutationFn: async (userData: Omit<User, 'id'>) => {
-      const { data } = await appHttp.post<User>('/users', userData);
-      return data;
+      const { data } = await appHttp.post<{ data: User }>('/users', userData);
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -47,8 +47,8 @@ export const useUpdateUser = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...userData }: User) => {
-      const { data } = await appHttp.put<User>(`/users/${id}`, userData);
-      return data;
+      const { data } = await appHttp.put<{ data: User }>(`/users/${id}`, userData);
+      return data.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -84,8 +84,8 @@ export const useToggleUserStatus = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } = await appHttp.patch<User>(`/users/${id}/toggle`);
-      return data;
+      const { data } = await appHttp.patch<{ data: User }>(`/users/${id}/toggle-status`);
+      return data.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });

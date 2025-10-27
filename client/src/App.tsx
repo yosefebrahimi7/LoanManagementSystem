@@ -12,6 +12,7 @@ import LoanPayment from "./pages/LoanPayment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import Layout from "./components/Layout";
 
 const router = createBrowserRouter([
@@ -45,9 +46,9 @@ const router = createBrowserRouter([
     path: "/users",
     element: (
       <Layout>
-        <ProtectedRoute>
+        <AdminRoute>
           <Users />
-        </ProtectedRoute>
+        </AdminRoute>
       </Layout>
     ),
   },
@@ -75,9 +76,9 @@ const router = createBrowserRouter([
           path: "/loan-approval",
           element: (
             <Layout>
-              <ProtectedRoute>
+              <AdminRoute>
                 <LoanApproval />
-              </ProtectedRoute>
+              </AdminRoute>
             </Layout>
           ),
         },

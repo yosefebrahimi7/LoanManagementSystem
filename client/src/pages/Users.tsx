@@ -1,8 +1,47 @@
-import { useUsers, useToggleUserStatus } from "../hooks/useUsers";
+import { useUsers, useToggleUserStatus, useDeleteUser, useUser } from "../hooks/useUsers";
+import { useState } from "react";
+import UserDetailsModal from "../components/UserDetailsModal";
 
 function Users() {
   const { data: users, isLoading, isError, error } = useUsers();
   const toggleStatus = useToggleUserStatus();
+  const deleteUser = useDeleteUser();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('آیا از حذف این کاربر مطمئن هستید؟')) {
+      setDeletingId(id);
+      await deleteUser.mutateAsync(id);
+      setDeletingId(null);
+    }
+  };
+
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'نامشخص';
+    
+    try {
+      const date = new Date(dateString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'نامشخص';
+      }
+      
+      return date.toLocaleString("fa-IR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (e) {
+      return 'نامشخص';
+    }
+  };
+
+  // Get selected user data
+  const { data: selectedUser } = useUser(selectedUserId || 0);
 
   if (isLoading) {
     return (
@@ -134,76 +173,111 @@ function Users() {
                     </td>
                     <td>
                       <div className="text-sm" dir="ltr">
-                        {new Date(user.createdAt).toLocaleString("fa-IR", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        })}
+                        {formatDate(user.createdAt)}
                       </div>
                     </td>
                     <td>
                       <div className="text-sm" dir="ltr">
-                        {new Date(user.updatedAt).toLocaleString("fa-IR", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        })}
+                        {formatDate(user.updatedAt)}
                       </div>
                     </td>
                     <td>
-                      <button
-                        onClick={() => toggleStatus.mutate(user.id)}
-                        disabled={toggleStatus.isPending}
-                        className={`btn btn-sm gap-2 min-w-[95px] ${
-                          user.isActive ? "btn-error" : "btn-success"
-                        }`}
-                      >
-                        {toggleStatus.isPending ? (
-                          <span className="loading loading-spinner loading-xs"></span>
-                        ) : user.isActive ? (
-                          <>
+                      <div className="flex items-center gap-2">
+                        {/* Toggle Status Button - Hide for admin */}
+                        {user.roleName !== 'admin' && (
+                          <button
+                            onClick={() => toggleStatus.mutate(user.id)}
+                            disabled={toggleStatus.isPending}
+                            className="btn btn-sm btn-circle btn-ghost"
+                            title={user.isActive ? "غیرفعال کردن" : "فعال کردن"}
+                          >
+                          {toggleStatus.isPending ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : (
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
+                              className={`h-5 w-5 ${user.isActive ? 'text-warning' : 'text-success'}`}
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                              />
+                              {user.isActive ? (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                                />
+                              ) : (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              )}
                             </svg>
-                            غیرفعال
-                          </>
-                        ) : (
-                          <>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                            فعال
-                          </>
+                          )}
+                          </button>
                         )}
-                      </button>
+
+                        {/* View/Edit Button */}
+                        <button
+                          onClick={() => setSelectedUserId(user.id)}
+                          className="btn btn-sm btn-circle btn-ghost"
+                          title="مشاهده جزئیات"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-info"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
+                          </svg>
+                        </button>
+
+                        {/* Delete Button - Hide for admin */}
+                        {user.roleName !== 'admin' && (
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            disabled={deletingId === user.id}
+                            className="btn btn-sm btn-circle btn-ghost"
+                            title="حذف کاربر"
+                          >
+                            {deletingId === user.id ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-error"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -232,6 +306,14 @@ function Users() {
             <p className="text-base-content/60">اولین کاربر سیستم باشید</p>
           </div>
         </div>
+      )}
+      
+      {/* User Details Modal */}
+      {selectedUserId && selectedUser && (
+        <UserDetailsModal
+          user={selectedUser}
+          onClose={() => setSelectedUserId(null)}
+        />
       )}
     </div>
   );
