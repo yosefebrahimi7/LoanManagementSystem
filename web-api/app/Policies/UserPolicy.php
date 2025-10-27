@@ -11,7 +11,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->is_active;
+        return $user->is_active && $user->isAdmin();
     }
 
     /**
@@ -43,7 +43,11 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->is_active && $user->isAdmin() && $user->id !== $model->id;
+        // Prevent deleting admin users and self
+        return $user->is_active 
+            && $user->isAdmin() 
+            && $user->id !== $model->id 
+            && !$model->isAdmin(); // Cannot delete admin users
     }
 
     /**

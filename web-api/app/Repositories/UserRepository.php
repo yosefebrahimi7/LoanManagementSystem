@@ -68,6 +68,14 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * Get paginated users
+     */
+    public function paginate(int $perPage = 15)
+    {
+        return $this->model->orderBy('created_at', 'desc')->paginate($perPage);
+    }
+
+    /**
      * Check if user exists by email
      */
     public function existsByEmail(string $email): bool

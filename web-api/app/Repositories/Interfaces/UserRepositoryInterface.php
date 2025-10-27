@@ -37,6 +37,11 @@ interface UserRepositoryInterface
     public function all(): \Illuminate\Database\Eloquent\Collection;
 
     /**
+     * Get paginated users
+     */
+    public function paginate(int $perPage = 15);
+
+    /**
      * Check if user exists by email
      */
     public function existsByEmail(string $email): bool;

@@ -15,6 +15,8 @@ use App\Services\Interfaces\AuthServiceInterface;
 use App\Services\AuthService;
 use App\Services\Interfaces\PaymentServiceInterface;
 use App\Services\PaymentService;
+use App\Services\Interfaces\UserServiceInterface;
+use App\Services\UserService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         // Service bindings
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
         $this->app->bind(PaymentServiceInterface::class, PaymentService::class);
+        $this->app->bind(UserServiceInterface::class, UserService::class);
     }
 
     /**
@@ -48,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerPolicies(): void
     {
+        // User Policies
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
+        
         // Payment Policies
         \Illuminate\Support\Facades\Gate::policy(\App\Models\LoanPayment::class, \App\Policies\PaymentPolicy::class);
         

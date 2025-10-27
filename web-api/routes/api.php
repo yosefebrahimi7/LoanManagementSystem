@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\UserResource;
 use App\Models\Loan;
@@ -47,6 +48,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [LoanController::class, 'adminIndex']);
         Route::get('/stats', [LoanController::class, 'stats']);
         Route::post('/{id}/approve', [LoanController::class, 'approve']);
+    });
+
+    // Admin user management routes
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
+        Route::patch('/{id}/toggle-status', [UserController::class, 'toggleStatus']);
     });
 
     // Payment routes
