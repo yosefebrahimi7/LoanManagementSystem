@@ -16,10 +16,16 @@
 
 ## 📦 نصب و راه‌اندازی
 
+### تکنولوژی‌ها
+- **Backend**: Laravel 12.0 (PHP 8.2+)
+- **Frontend**: React 19.1.1 + TypeScript 5.9
+- **Database**: MySQL 8.0+ / MariaDB
+- **Package Manager**: Composer (PHP) + npm 18+ (Node.js)
+
 ### پیش‌نیازها
-- PHP 8.2+
-- Composer
-- MySQL/MariaDB 8.0+
+- PHP 8.2+ با extensions: pdo, pdo_mysql, mbstring, openssl
+- Composer 2.x
+- MySQL/MariaDB 8.0+ یا PostgreSQL
 - Node.js 18+ و npm/yarn
 
 ### Backend (Laravel)
@@ -79,16 +85,17 @@ cd web-api
 php artisan test
 ```
 
-20+ تست جامع شامل:
-- Auth Tests (8)
-- Loan Tests (3)
-- Penalty Tests (4)
-- Wallet Tests (5)
+**49 تست جامع** با **199 Assertion** شامل:
+- ✅ **Auth Tests**: 9 تست
+- ✅ **Loan Tests**: 6 تست
+- ✅ **Payment Tests**: 6 تست
+- ✅ **Penalty Tests**: 3 تست
+- ✅ **Wallet Tests**: 25 تست
 
 ## 🏗️ معماری
 
-- **Backend**: Laravel 11 با Repository Pattern, Service Layer, Policies
-- **Frontend**: React + TypeScript + DaisyUI + React Query
+- **Backend**: Laravel 12 با Repository Pattern, Service Layer, Policies
+- **Frontend**: React 19 + TypeScript + DaisyUI + React Query
 - **Database**: MySQL با migrations و seeders
 - **Payment Gateway**: Zarinpal (Sandbox/Production)
 - **Documentation**: Swagger/OpenAPI
@@ -110,13 +117,14 @@ LoanManagementSystem/
 
 ## 💡 تکنولوژی‌های استفاده شده
 
-- Laravel 11
-- React 18 + TypeScript
-- DaisyUI (Tailwind CSS)
-- Zarinpal Payment Gateway
-- MySQL
-- Sanctum Authentication
-- Pest Testing Framework
+- **Laravel 12** (PHP 8.2+)
+- **React 19** + TypeScript
+- **Tailwind CSS 4** + DaisyUI
+- **Zarinpal Payment Gateway** (Sandbox/Production)
+- **MySQL 8.0+**
+- **Sanctum** برای احراز هویت
+- **Pest 3** برای تست‌ها
+- **Swagger/OpenAPI** برای مستندات API
 
 ## 📝 License
 
