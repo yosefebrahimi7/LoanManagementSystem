@@ -1253,6 +1253,229 @@
                     }
                 ]
             }
+        },
+        "/api/wallet": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get wallet balance",
+                "description": "Get user's wallet balance",
+                "operationId": "getWallet",
+                "responses": {
+                    "200": {
+                        "description": "Wallet information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "balance": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "formatted_balance": {
+                                                    "type": "string",
+                                                    "example": "0.00"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "IRR"
+                                                },
+                                                "is_shared": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/wallet/transactions": {
+            "get": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get wallet transactions",
+                "description": "Get wallet transactions",
+                "operationId": "getWalletTransactions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wallet transactions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/wallet/recharge": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Initiate wallet recharge",
+                "description": "Initiate wallet recharge",
+                "operationId": "rechargeWallet",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount",
+                                    "method"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "description": "Amount in Tomans (min: 10,000, max: 2,000,000,000)",
+                                        "type": "integer",
+                                        "example": 1000000
+                                    },
+                                    "method": {
+                                        "type": "string",
+                                        "example": "zarinpal"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment initiated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "payment_url": {
+                                                    "type": "string"
+                                                },
+                                                "authority": {
+                                                    "type": "string"
+                                                },
+                                                "transaction_id": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/wallet/callback": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Wallet recharge callback",
+                "description": "Handle wallet recharge callback from payment gateway",
+                "operationId": "walletRechargeCallback",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "Authority": {
+                                        "type": "string"
+                                    },
+                                    "Status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Callback processed"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -1422,6 +1645,10 @@
         {
             "name": "Users",
             "description": "User management endpoints for admin"
+        },
+        {
+            "name": "Wallet",
+            "description": "Wallet management endpoints"
         },
         {
             "name": "Admin",
