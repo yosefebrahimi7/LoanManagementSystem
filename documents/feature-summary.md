@@ -31,10 +31,15 @@
 - ✅ پشتیبانی از پرداخت جزئی
 
 ### 5. Wallet System
-- ✅ کیف پول شخصی برای هر کاربر
-- ✅ ثبت تمام تراکنش‌ها
-- ✅ ثبت تغییرات موجودی
+- ✅ کیف پول مشترک برای تمام ادمین‌ها
+- ✅ کیف پول شخصی برای هر کاربر عادی
+- ✅ شارژ کیف پول از طریق درگاه زرین‌پال
+- ✅ ثبت تمام تراکنش‌ها به صورت کامل
+- ✅ ثبت تغییرات موجودی (Balance ledger)
 - ✅ Atomic ledger entries
+- ✅ تبدیل واحدهای پولی (تومان ↔ ریال)
+- ✅ محدودیت شارژ: 10,000 تا 2,000,000,000 تومان
+- ✅ UI/UX کامل با نمایش به فارسی
 
 ### 6. Admin Panel
 - ✅ مشاهده تمام وام‌ها
@@ -55,12 +60,13 @@
 - ✅ Welcome email
 
 ### 9. Testing
-- ✅ 15+ تست جامع
+- ✅ 20+ تست جامع
 - ✅ Unit Tests
 - ✅ Feature Tests
 - ✅ Auth Tests (8)
 - ✅ Loan Tests (3)
 - ✅ Penalty Tests (4)
+- ✅ Wallet Tests (5)
 
 ### 10. Code Quality
 - ✅ Repository Pattern
@@ -84,20 +90,27 @@ web-api/
 │   │   ├── PenaltyService.php        # منطق جریمه
 │   │   ├── LoanService.php           # مدیریت وام
 │   │   ├── PaymentService.php        # پرداخت
-│   │   └── AuthService.php           # احراز هویت
+│   │   ├── AuthService.php           # احراز هویت
+│   │   ├── WalletService.php         # کیف پول
+│   │   └── ZarinpalService.php       # درگاه پرداخت
+│   ├── Http/Controllers/Api/
+│   │   └── WalletController.php      # API کیف پول
 │   └── Models/
 │       ├── Loan.php
 │       ├── LoanSchedule.php
 │       ├── LoanPayment.php
+│       ├── Wallet.php
+│       ├── WalletTransaction.php
 │       └── User.php
 ├── routes/
 │   ├── api.php              # API Routes
 │   └── console.php          # Scheduled Tasks
 └── tests/
     ├── Feature/
-    │   ├── AuthTest.php
-    │   ├── LoanTest.php
-    │   └── PenaltyTest.php
+│   ├── AuthTest.php
+│   ├── LoanTest.php
+│   ├── PenaltyTest.php
+│   └── WalletTest.php
     └── Pest.php
 ```
 
@@ -138,8 +151,9 @@ Schedule::command('loans:process-penalties')
 - `loans` - وام‌ها
 - `loan_schedules` - جدول زمانبندی پرداخت
 - `loan_payments` - پرداخت‌ها
-- `wallets` - کیف پول
+- `wallets` - کیف پول (با فیلد is_shared)
 - `wallet_transactions` - تراکنش‌های کیف پول
+- `notifications` - اعلان‌ها
 - `settings` - تنظیمات سیستم
 - `personal_access_tokens` - توکن‌های احراز هویت
 
@@ -157,13 +171,16 @@ php artisan test
 php artisan test --filter AuthTest
 php artisan test --filter LoanTest
 php artisan test --filter PenaltyTest
+php artisan test --filter WalletTest
 ```
 
 ---
 
 ## 📝 مستندات
 
-- `documents/API_README.md` - راهنمای کامل API
+- `documents/api-readme.md` - راهنمای کامل API
+- `documents/wallet-implementation.md` - مستندات کیف پول
+- `documents/wallet-status.md` - وضعیت کیف پول
 - `documents/env.template` - نمونه تنظیمات
 - `web-api/README.md` - راهنمای نصب و استفاده
 - `temps/remaining_tasks.md` - لیست کارهای انجام شده
@@ -173,7 +190,7 @@ php artisan test --filter PenaltyTest
 ## 🎯 Acceptance Criteria
 
 ✅ Repo boots with `composer install`, `php artisan migrate --seed`, and `php artisan serve`  
-✅ Tests run: `./vendor/bin/pest` and pass (15+ tests)  
+✅ Tests run: `./vendor/bin/pest` and pass (20+ tests)  
 ✅ Admin & User panels accessible with seeded demo accounts  
 ✅ Swagger documentation accessible at `/api/documentation`  
 ✅ Clear README with endpoints and sample requests  

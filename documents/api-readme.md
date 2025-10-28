@@ -5,6 +5,7 @@
 - [پیکربندی محیط](#پیکربندی-محیط)
 - [اجرای برنامه](#اجرای-برنامه)
 - [API Endpoints](#api-endpoints)
+- [Wallet API](#wallet-api)
 - [تست‌ها](#تست‌ها)
 - [ویژگی‌ها](#ویژگی‌ها)
 - [توسعه](#توسعه)
@@ -303,6 +304,81 @@ php artisan make:service YourService
 - **Command**: `php artisan loans:process-penalties`
 - **Schedule**: هر روز در ساعت 00:00
 - **Rate**: قابل تنظیم از `settings` table (default: 0.5% per day)
+
+---
+
+## Wallet API
+
+### خروجی GET /api/wallet
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "balance": 0,
+    "formatted_balance": "0.00",
+    "currency": "IRR",
+    "is_shared": false
+  }
+}
+```
+
+**توضیحات:**
+- `balance`: موجودی به ریال
+- `formatted_balance`: موجودی به صورت رشته
+- `is_shared`: true برای کیف پول مشترک ادمین، false برای کیف پول کاربری
+
+### خروجی GET /api/wallet/transactions
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "type": "credit",
+      "amount": 10000000,
+      "balance_after": 10000000,
+      "description": "شارژ کیف پول",
+      "created_at": "2024-01-01T12:00:00.000000Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 1,
+    "per_page": 10,
+    "total": 1
+  }
+}
+```
+
+**توضیحات:**
+- `amount`: مبلغ به ریال
+- `type`: "credit" برای شارژ، "debit" برای برداشت
+- `balance_after`: موجودی پس از این تراکنش
+
+### ورودی POST /api/wallet/recharge
+```json
+{
+  "amount": 1000000,
+  "method": "zarinpal"
+}
+```
+
+**اعتبارسنجی:**
+- `amount`: required, integer, min:10000, max:2000000000 (به تومان)
+- `method`: required, string
+
+**خروجی:**
+```json
+{
+  "success": true,
+  "data": {
+    "payment_url": "https://sandbox.zarinpal.com/pg/StartPay/...",
+    "authority": "A00000000000000000000000000000000000",
+    "transaction_id": 1
+  }
+}
+```
 
 ---
 
