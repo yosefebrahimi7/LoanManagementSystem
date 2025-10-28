@@ -22,8 +22,9 @@ class WalletFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'balance' => $this->faker->numberBetween(0, 10000000), // 0 to 100M IRR (in cents)
+            'balance' => $this->faker->numberBetween(0, 10000000), // 0 to 10M Rials (0 to 1M Tomans)
             'currency' => 'IRR',
+            'is_shared' => false,
         ];
     }
 
@@ -53,7 +54,19 @@ class WalletFactory extends Factory
     public function wealthy(): static
     {
         return $this->state(fn (array $attributes) => [
-            'balance' => $this->faker->numberBetween(5000000, 50000000), // 50M to 500M IRR
+            'balance' => $this->faker->numberBetween(5000000, 50000000), // 5M to 50M Rials (500K to 5M Tomans)
+        ]);
+    }
+
+    /**
+     * Indicate that the wallet is a shared admin wallet.
+     */
+    public function sharedAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => null,
+            'balance' => 100000000, // 100M Rials = 10M Tomans
+            'is_shared' => true,
         ]);
     }
 }

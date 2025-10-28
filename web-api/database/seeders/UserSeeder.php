@@ -51,8 +51,32 @@ class UserSeeder extends Seeder
         );
 
         // Create wallets for users if they don't exist
-        Wallet::updateOrCreate(['user_id' => $admin->id], ['balance' => 0]);
-        Wallet::updateOrCreate(['user_id' => $user1->id], ['balance' => 0]);
-        Wallet::updateOrCreate(['user_id' => $user2->id], ['balance' => 0]);
+        // Wallets should have balance in Rials, currency is IRR
+        Wallet::updateOrCreate(
+            ['user_id' => $admin->id],
+            [
+                'balance' => 0, // in Rials
+                'currency' => 'IRR',
+                'is_shared' => false,
+            ]
+        );
+        
+        Wallet::updateOrCreate(
+            ['user_id' => $user1->id],
+            [
+                'balance' => 0, // in Rials
+                'currency' => 'IRR',
+                'is_shared' => false,
+            ]
+        );
+        
+        Wallet::updateOrCreate(
+            ['user_id' => $user2->id],
+            [
+                'balance' => 0, // in Rials
+                'currency' => 'IRR',
+                'is_shared' => false,
+            ]
+        );
     }
 }

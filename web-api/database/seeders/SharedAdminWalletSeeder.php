@@ -12,22 +12,23 @@ class SharedAdminWalletSeeder extends Seeder
      */
     public function run(): void
     {
-        // Check if shared admin wallet already exists
-        $existingWallet = Wallet::where('is_shared', true)
-            ->whereNull('user_id')
-            ->first();
-
-        if (!$existingWallet) {
-            Wallet::create([
-                'user_id' => null,
-                'balance' => 0,
-                'currency' => 'IRR',
+        // Create or update shared admin wallet with initial balance
+        // Balance is in Rials (100,000,000 Rials = 10,000,000 Tomans initial capital)
+        $existingWallet = Wallet::updateOrCreate(
+            [
                 'is_shared' => true,
-            ]);
+                'user_id' => null,
+            ],
+            [
+                'balance' => 100000000, // 100M Rials = 10M Tomans initial capital
+                'currency' => 'IRR',
+            ]
+        );
 
-            $this->command->info('Shared admin wallet created successfully.');
+        if ($existingWallet->wasRecentlyCreated) {
+            $this->command->info('Shared admin wallet created with initial balance of 10,000,000 Tomans.');
         } else {
-            $this->command->info('Shared admin wallet already exists.');
+            $this->command->info('Shared admin wallet already exists. Balance: ' . number_format($existingWallet->balance / 100, 0) . ' Tomans');
         }
     }
 }

@@ -88,8 +88,9 @@ class LoanSeeder extends Seeder
             ['user_id' => $user->id],
             [
                 'user_id' => $user->id,
-                'balance' => rand(0, 5000000), // 0 to 50M IRR
+                'balance' => rand(0, 5000000), // 0 to 5M Rials (0 to 500K Tomans)
                 'currency' => 'IRR',
+                'is_shared' => false,
             ]
         );
     }
