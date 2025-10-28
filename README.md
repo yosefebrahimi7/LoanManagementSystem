@@ -17,10 +17,10 @@
 ## 📦 نصب و راه‌اندازی
 
 ### تکنولوژی‌ها
-- **Backend**: Laravel 12.0 (PHP 8.2+)
-- **Frontend**: React 19.1.1 + TypeScript 5.9
+- **Backend**: Laravel 12 (PHP 8.2+)
+- **Frontend**: React 19 + TypeScript 5.9
 - **Database**: MySQL 8.0+ / MariaDB
-- **Package Manager**: Composer (PHP) + npm 18+ (Node.js)
+- **Package Manager**: Composer 2.x + npm 18+
 
 ### پیش‌نیازها
 - PHP 8.2+ با extensions: pdo, pdo_mysql, mbstring, openssl
@@ -94,11 +94,11 @@ php artisan test
 
 ## 🏗️ معماری
 
-- **Backend**: Laravel 12 با Repository Pattern, Service Layer, Policies
-- **Frontend**: React 19 + TypeScript + DaisyUI + React Query
-- **Database**: MySQL با migrations و seeders
+- **Backend**: Laravel 12 (PHP 8.2+) با Repository Pattern, Service Layer, Policies
+- **Frontend**: React 19 (TypeScript 5.9) + DaisyUI + React Query
+- **Database**: MySQL 8.0+ با migrations و seeders
 - **Payment Gateway**: Zarinpal (Sandbox/Production)
-- **Documentation**: Swagger/OpenAPI
+- **Documentation**: Swagger/OpenAPI (L5-Swagger 8)
 
 ## 📁 ساختار پروژه
 
@@ -117,14 +117,21 @@ LoanManagementSystem/
 
 ## 💡 تکنولوژی‌های استفاده شده
 
-- **Laravel 12** (PHP 8.2+)
-- **React 19** + TypeScript
-- **Tailwind CSS 4** + DaisyUI
-- **Zarinpal Payment Gateway** (Sandbox/Production)
-- **MySQL 8.0+**
-- **Sanctum** برای احراز هویت
-- **Pest 3** برای تست‌ها
-- **Swagger/OpenAPI** برای مستندات API
+### Backend
+- **Laravel** 12.x (PHP 8.2+)
+- **Sanctum** 4.x برای احراز هویت
+- **MySQL** 8.0+ Database
+- **Zarinpal SDK** 2.x برای پرداخت
+- **Pest** 3.x برای تست‌ها
+- **L5-Swagger** 8.x برای مستندات API
+
+### Frontend
+- **React** 19.x
+- **TypeScript** 5.9.x
+- **Tailwind CSS** 4.x + **DaisyUI** 5.x
+- **React Query** 5.x برای state management
+- **Axios** 1.x برای HTTP requests
+- **React Router** 7.x برای routing
 
 ## 📝 License
 
