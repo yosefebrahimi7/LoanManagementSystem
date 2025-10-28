@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useLoan } from "../hooks/useLoans";
 import { useInitiatePayment } from "../hooks/usePayments";
 import useAuth from "../stores/auth";
 import { getLoanStatusBadge } from "../utils/loanStatus";
 import { useQueryClient } from "@tanstack/react-query";
+import PaymentConfirmDialog from "../components/PaymentConfirmDialog";
 
 export default function LoanPayment() {
   const { id } = useParams();
@@ -12,6 +14,8 @@ export default function LoanPayment() {
   const queryClient = useQueryClient();
   const { data: loan, isLoading, error, refetch } = useLoan(Number(id));
   const initiatePayment = useInitiatePayment();
+  const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ['loan', id] });
@@ -70,12 +74,25 @@ export default function LoanPayment() {
 
   const handlePayment = (scheduleId: number) => {
     const schedule = paymentSchedules.find(s => s.id === scheduleId);
-    const remainingAmount = schedule ? schedule.amount_due - schedule.paid_amount : undefined;
+    if (schedule) {
+      setSelectedSchedule(schedule);
+      setShowConfirmDialog(true);
+    }
+  };
+
+  const handleConfirmPayment = () => {
+    if (!selectedSchedule) return;
     
+    const remainingAmount = selectedSchedule.amount_due - selectedSchedule.paid_amount;
     initiatePayment.mutate({ 
       loanId: loan.id, 
-      scheduleId,
+      scheduleId: selectedSchedule.id,
       amount: remainingAmount
+    }, {
+      onSuccess: () => {
+        setShowConfirmDialog(false);
+        setSelectedSchedule(null);
+      }
     });
   };
 
@@ -260,6 +277,18 @@ export default function LoanPayment() {
           </div>
         </div>
       </div>
+
+      {/* Payment Confirm Dialog */}
+      <PaymentConfirmDialog
+        schedule={selectedSchedule}
+        isOpen={showConfirmDialog}
+        onClose={() => {
+          setShowConfirmDialog(false);
+          setSelectedSchedule(null);
+        }}
+        onConfirm={handleConfirmPayment}
+        isProcessing={initiatePayment.isPending}
+      />
     </div>
   );
 }
