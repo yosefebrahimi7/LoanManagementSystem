@@ -164,7 +164,8 @@ Redirect to frontend
 
 - **فایل‌های Backend ایجاد شده:** 15+
 - **فایل‌های Frontend ایجاد شده:** 8+
-- **تست‌ها:** 20+
+- **تست‌های Wallet:** 25 تست (بخشی از 49 تست کل)
+- **Assertions:** 199 assertion
 - **API Endpoints:** 4
 - **Components:** 3
 - **مستندات:** 5 فایل

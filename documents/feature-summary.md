@@ -60,13 +60,14 @@
 - ✅ Welcome email
 
 ### 9. Testing
-- ✅ 20+ تست جامع
+- ✅ **49 تست جامع** با **199 Assertion**
 - ✅ Unit Tests
 - ✅ Feature Tests
-- ✅ Auth Tests (8)
-- ✅ Loan Tests (3)
-- ✅ Penalty Tests (4)
-- ✅ Wallet Tests (5)
+- ✅ Auth Tests (9)
+- ✅ Loan Tests (6)
+- ✅ Payment Tests (6)
+- ✅ Penalty Tests (3)
+- ✅ Wallet Tests (25)
 
 ### 10. Code Quality
 - ✅ Repository Pattern
@@ -190,7 +191,7 @@ php artisan test --filter WalletTest
 ## 🎯 Acceptance Criteria
 
 ✅ Repo boots with `composer install`, `php artisan migrate --seed`, and `php artisan serve`  
-✅ Tests run: `./vendor/bin/pest` and pass (20+ tests)  
+✅ Tests run: `php artisan test` and pass (**49 tests** with **199 assertions**)  
 ✅ Admin & User panels accessible with seeded demo accounts  
 ✅ Swagger documentation accessible at `/api/documentation`  
 ✅ Clear README with endpoints and sample requests  
@@ -202,7 +203,7 @@ php artisan test --filter WalletTest
 - Architecture & Separation of Concerns — 20 ✅
 - Correctness of Financial Logic — 20 ✅
 - Security & Access Control (Policies) — 15 ✅
-- Tests (quality & coverage) — 15 ✅ (15+ tests)
+- Tests (quality & coverage) — 15 ✅ (**49 tests**, **199 assertions**)
 - Error handling & resilience — 10 ✅
 - README / Setup / Documentation — 10 ✅
 - Bonus (Swagger docs) — +10 ✅
