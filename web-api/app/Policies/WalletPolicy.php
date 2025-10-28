@@ -20,7 +20,17 @@ class WalletPolicy
      */
     public function view(User $user, Wallet $wallet): bool
     {
-        return $user->is_active && ($user->id === $wallet->user_id || $user->isAdmin());
+        // Regular users can only view their own wallet
+        if (!$user->is_active) {
+            return false;
+        }
+        
+        // If wallet is shared admin wallet
+        if ($wallet->is_shared && $wallet->user_id === null) {
+            return $user->isAdmin();
+        }
+        
+        return $user->id === $wallet->user_id || $user->isAdmin();
     }
 
     /**
@@ -36,7 +46,16 @@ class WalletPolicy
      */
     public function update(User $user, Wallet $wallet): bool
     {
-        return $user->is_active && ($user->id === $wallet->user_id || $user->isAdmin());
+        if (!$user->is_active) {
+            return false;
+        }
+        
+        // If wallet is shared admin wallet, only admins can update
+        if ($wallet->is_shared && $wallet->user_id === null) {
+            return $user->isAdmin();
+        }
+        
+        return $user->id === $wallet->user_id || $user->isAdmin();
     }
 
     /**
@@ -52,7 +71,16 @@ class WalletPolicy
      */
     public function makeTransaction(User $user, Wallet $wallet): bool
     {
-        return $user->is_active && $user->id === $wallet->user_id;
+        if (!$user->is_active) {
+            return false;
+        }
+        
+        // If wallet is shared admin wallet, only admins can make transactions
+        if ($wallet->is_shared && $wallet->user_id === null) {
+            return $user->isAdmin();
+        }
+        
+        return $user->id === $wallet->user_id || $user->isAdmin();
     }
 
     /**
@@ -60,6 +88,15 @@ class WalletPolicy
      */
     public function viewTransactions(User $user, Wallet $wallet): bool
     {
-        return $user->is_active && ($user->id === $wallet->user_id || $user->isAdmin());
+        if (!$user->is_active) {
+            return false;
+        }
+        
+        // If wallet is shared admin wallet, only admins can view transactions
+        if ($wallet->is_shared && $wallet->user_id === null) {
+            return $user->isAdmin();
+        }
+        
+        return $user->id === $wallet->user_id || $user->isAdmin();
     }
 }

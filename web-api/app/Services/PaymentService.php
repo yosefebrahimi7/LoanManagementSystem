@@ -54,10 +54,14 @@ class PaymentService implements PaymentServiceInterface
         ]);
 
         // Request payment from Zarinpal
+        // Note: $amount is in Tomans, but Zarinpal expects Rials
+        // For loans, amounts are stored in Tomans, so we need to convert
+        $amountInRials = $amount * 10;
+        
         $description = "پرداخت قسط {$schedule->installment_number} وام {$loan->id}";
         
         $result = $this->zarinpalService->requestPayment(
-            amount: $amount,
+            amount: $amountInRials,
             description: $description,
             callbackUrl: config('services.zarinpal.callback_url'),
             metadata: [
@@ -177,7 +181,9 @@ class PaymentService implements PaymentServiceInterface
      */
     public function verifyPayment(LoanPayment $payment): array
     {
-        return $this->zarinpalService->verifyPayment($payment->gateway_reference, $payment->amount);
+        // Convert amount from Tomans to Rials for Zarinpal
+        $amountInRials = $payment->amount * 10;
+        return $this->zarinpalService->verifyPayment($payment->gateway_reference, $amountInRials);
     }
 
     /**

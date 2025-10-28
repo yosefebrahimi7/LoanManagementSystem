@@ -126,11 +126,42 @@ class WalletRepository implements WalletRepositoryInterface
     }
 
     /**
+     * Get shared admin wallet
+     */
+    public function getSharedAdminWallet(): ?Wallet
+    {
+        return Cache::remember("wallet.shared.admin", 300, function () {
+            return $this->model->sharedAdminWallet()->first();
+        });
+    }
+
+    /**
+     * Create or get shared admin wallet
+     */
+    public function getOrCreateSharedAdminWallet(): Wallet
+    {
+        $wallet = $this->getSharedAdminWallet();
+        
+        if (!$wallet) {
+            $wallet = $this->create([
+                'user_id' => null,
+                'balance' => 0,
+                'currency' => 'IRR',
+                'is_shared' => true,
+            ]);
+            Cache::forget("wallet.shared.admin");
+        }
+        
+        return $wallet;
+    }
+
+    /**
      * Clear wallet-related cache
      */
     private function clearWalletCache(Wallet $wallet): void
     {
         Cache::forget('wallets.all');
+        Cache::forget('wallet.shared.admin');
         Cache::forget("wallet.user.{$wallet->user_id}");
         Cache::forget("wallet.balance.{$wallet->id}");
         Cache::forget('wallets.with_transactions');

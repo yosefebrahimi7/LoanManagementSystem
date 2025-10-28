@@ -132,7 +132,7 @@ function WalletDropdown() {
                     </div>
                     <div className={`text-sm font-bold ${getTransactionColor(transaction.type)}`}>
                       {transaction.type === 'credit' ? '+' : '-'}
-                      {formatAmountWithPersianDigits(transaction.amount / 10)} تومان
+                      {formatAmountWithPersianDigits(transaction.amount / 10)}
                     </div>
                   </div>
                 ))}

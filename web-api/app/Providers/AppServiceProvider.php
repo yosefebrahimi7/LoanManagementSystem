@@ -19,6 +19,8 @@ use App\Services\Interfaces\UserServiceInterface;
 use App\Services\UserService;
 use App\Services\Interfaces\NotificationServiceInterface;
 use App\Services\NotificationService;
+use App\Services\Interfaces\WalletServiceInterface;
+use App\Services\WalletService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PaymentServiceInterface::class, PaymentService::class);
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(NotificationServiceInterface::class, NotificationService::class);
+        $this->app->bind(WalletServiceInterface::class, WalletService::class);
     }
 
     /**
@@ -71,6 +74,9 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Notifications\DatabaseNotification::class,
             \App\Policies\NotificationPolicy::class
         );
+        
+        // Wallet Policies
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Wallet::class, \App\Policies\WalletPolicy::class);
     }
 
     /**

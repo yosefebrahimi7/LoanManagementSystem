@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WalletController;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\UserResource;
 use App\Models\Loan;
@@ -28,8 +29,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
-// Payment callback (public route for gateway)
+// Payment callback (public routes for gateway)
 Route::match(['get', 'post'], '/payment/callback', [PaymentController::class, 'callback']);
+Route::match(['get', 'post'], '/wallet/callback', [WalletController::class, 'callback']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -75,6 +77,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    });
+
+    // Wallet routes
+    Route::prefix('wallet')->group(function () {
+        Route::get('/', [WalletController::class, 'index']);
+        Route::get('/transactions', [WalletController::class, 'transactions']);
+        Route::post('/recharge', [WalletController::class, 'recharge']);
     });
 
     // Example of using API Resources directly in routes

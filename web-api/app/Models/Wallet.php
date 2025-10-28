@@ -15,10 +15,12 @@ class Wallet extends Model
         'user_id',
         'balance',
         'currency',
+        'is_shared',
     ];
 
     protected $casts = [
         'balance' => 'integer',
+        'is_shared' => 'boolean',
     ];
 
     /**
@@ -43,5 +45,29 @@ class Wallet extends Model
     public function getFormattedBalanceAttribute(): string
     {
         return number_format($this->balance / 100, 2);
+    }
+
+    /**
+     * Check if this is a shared admin wallet
+     */
+    public function isAdminSharedWallet(): bool
+    {
+        return $this->is_shared === true;
+    }
+
+    /**
+     * Scope to get shared admin wallet
+     */
+    public function scopeSharedAdminWallet($query)
+    {
+        return $query->where('is_shared', true)->where('user_id', null);
+    }
+
+    /**
+     * Scope to get user wallets
+     */
+    public function scopeUserWallets($query)
+    {
+        return $query->where('is_shared', false)->whereNotNull('user_id');
     }
 }

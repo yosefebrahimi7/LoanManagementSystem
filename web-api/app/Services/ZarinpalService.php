@@ -29,7 +29,7 @@ class ZarinpalService
     /**
      * Initiate payment request
      *
-     * @param int $amount Amount in Toman
+     * @param int $amount Amount in Rials
      * @param string $description
      * @param string|null $callbackUrl
      * @param array|null $metadata
@@ -105,7 +105,7 @@ class ZarinpalService
      * Verify payment
      *
      * @param string $authority
-     * @param int $amount
+     * @param int $amount Amount in Rials
      * @return array
      */
     public function verifyPayment(string $authority, int $amount): array

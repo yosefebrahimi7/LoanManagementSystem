@@ -51,4 +51,14 @@ interface WalletRepositoryInterface
      * Get wallet balance
      */
     public function getBalance(int $walletId): int;
+
+    /**
+     * Get shared admin wallet
+     */
+    public function getSharedAdminWallet(): ?Wallet;
+
+    /**
+     * Create or get shared admin wallet
+     */
+    public function getOrCreateSharedAdminWallet(): Wallet;
 }

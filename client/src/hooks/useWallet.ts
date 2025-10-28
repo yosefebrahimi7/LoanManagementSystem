@@ -20,7 +20,7 @@ export const useWalletTransactions = (page = 1, limit = 10) => {
     queryKey: ['wallet-transactions', page, limit],
     queryFn: async () => {
       const response = await appHttp.get(`/wallet/transactions?page=${page}&limit=${limit}`);
-      return response.data.data;
+      return response.data; // Controller already returns {success, data, meta}
     },
     staleTime: 1 * 60 * 1000, // 1 minute
   });
