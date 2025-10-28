@@ -31,6 +31,7 @@ class LoanPayment extends Model
      * Payment methods
      */
     const METHOD_ZARINPAL = 'zarinpal';
+    const METHOD_WALLET = 'wallet';
     const METHOD_MANUAL = 'manual';
 
     /**

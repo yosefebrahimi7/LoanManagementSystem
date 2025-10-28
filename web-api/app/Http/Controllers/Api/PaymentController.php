@@ -54,10 +54,13 @@ class PaymentController extends Controller
      *   ),
      *   @OA\Response(
      *     response=200,
-     *     description="Payment initiated",
+     *     description="Payment completed successfully from wallet",
      *     @OA\JsonContent(
-     *       @OA\Property(property="authority", type="string"),
-     *       @OA\Property(property="payment_url", type="string", format="url")
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="message", type="string", example="پرداخت با موفقیت انجام شد"),
+     *       @OA\Property(property="payment_id", type="integer"),
+     *       @OA\Property(property="schedule_status", type="string", example="paid"),
+     *       @OA\Property(property="remaining_balance", type="integer", description="Remaining loan balance in Tomans")
      *     )
      *   )
      * )

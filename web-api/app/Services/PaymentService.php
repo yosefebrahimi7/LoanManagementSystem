@@ -9,6 +9,7 @@ use App\Jobs\ProcessPaymentWalletUpdateJob;
 use App\Models\Loan;
 use App\Models\LoanPayment;
 use App\Models\LoanSchedule;
+use App\Models\Wallet;
 use App\Models\WalletTransaction;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use App\Repositories\Interfaces\WalletRepositoryInterface;
@@ -16,6 +17,7 @@ use App\Services\Interfaces\PaymentServiceInterface;
 use App\Services\NotificationService;
 use App\Services\ZarinpalService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\LoanException;
@@ -30,13 +32,16 @@ class PaymentService implements PaymentServiceInterface
     ) {}
 
     /**
-     * Initiate payment for a loan installment
+     * Pay installment directly from wallet (NO GATEWAY NEEDED)
      */
     public function initiatePayment(Loan $loan, int $scheduleId, ?int $amount = null): array
     {
-        $schedule = LoanSchedule::where('id', $scheduleId)
-            ->where('loan_id', $loan->id)
-            ->firstOrFail();
+        return DB::transaction(function () use ($loan, $scheduleId, $amount) {
+            // Lock schedule for update
+            $schedule = LoanSchedule::lockForUpdate()
+                ->where('id', $scheduleId)
+                ->where('loan_id', $loan->id)
+                ->firstOrFail();
 
         // Check if installment is already paid
         if ($schedule->status === LoanSchedule::STATUS_PAID) {
@@ -49,9 +54,12 @@ class PaymentService implements PaymentServiceInterface
             throw LoanException::badRequest('مبلغ نامعتبر است');
         }
 
-        // Check user's wallet balance
+        // Check user's wallet balance with lock
         $user = auth()->user();
-        $userWallet = $this->walletRepository->findByUserId($user->id);
+        $userWallet = Wallet::lockForUpdate()
+            ->where('user_id', $user->id)
+            ->where('is_shared', false)
+            ->first();
         
         if (!$userWallet) {
             throw LoanException::badRequest('کیف پول شما یافت نشد. لطفاً حساب خود را شارژ کنید.');
@@ -60,7 +68,7 @@ class PaymentService implements PaymentServiceInterface
         // Convert amount from Tomans to Rials for comparison with wallet balance
         $amountInRials = $amount * 10;
         
-        if (!$this->walletRepository->hasSufficientBalance($userWallet->id, $amountInRials)) {
+        if ($userWallet->balance < $amountInRials) {
             // Notify user about insufficient wallet balance
             $this->notificationService->notifyWalletInsufficient(
                 $user,
@@ -68,14 +76,14 @@ class PaymentService implements PaymentServiceInterface
                 $amountInRials
             );
             
-            throw LoanException::badRequest(
-                'موجودی کیف پول شما کافی نیست. موجودی: ' . 
-                number_format($userWallet->balance / 100, 0) . 
-                ' تومان. مبلغ مورد نیاز: ' . 
-                number_format($amount, 0) . 
-                ' تومان. لطفاً کیف پول خود را شارژ کنید.'
-            );
-        }
+                throw LoanException::badRequest(
+                    'موجودی کیف پول شما کافی نیست. موجودی: ' . 
+                    number_format($userWallet->balance / 10, 0) . 
+                    ' تومان. مبلغ مورد نیاز: ' . 
+                    number_format($amount, 0) . 
+                    ' تومان. لطفاً کیف پول خود را شارژ کنید.'
+                );
+            }
 
         // Create payment record using Repository
         $payment = $this->paymentRepository->create([
@@ -87,40 +95,86 @@ class PaymentService implements PaymentServiceInterface
             'status' => LoanPayment::STATUS_PENDING,
         ]);
 
-        // Request payment from Zarinpal
-        // Note: $amount is in Tomans, but Zarinpal expects Rials
-        // For loans, amounts are stored in Tomans, so we need to convert
-        $amountInRials = $amount * 10;
-        
-        $description = "پرداخت قسط {$schedule->installment_number} وام {$loan->id}";
-        
-        $result = $this->zarinpalService->requestPayment(
-            amount: $amountInRials,
-            description: $description,
-            callbackUrl: config('services.zarinpal.callback_url'),
-            metadata: [
-                'loan_id' => $loan->id,
-                'schedule_id' => $schedule->id,
-                'payment_id' => $payment->id,
-            ]
-        );
+        // NO GATEWAY - Pay directly from wallet
+        // Lock wallets for atomic operations
+        $adminWallet = Wallet::lockForUpdate()
+            ->where('is_shared', true)
+            ->whereNull('user_id')
+            ->first();
 
-        if (!$result['success']) {
-            throw LoanException::badRequest('امکان اتصال به درگاه پرداخت وجود ندارد');
+        if (!$adminWallet) {
+            throw LoanException::badRequest('کیف پول ادمین یافت نشد');
         }
 
-        // Update payment with gateway reference
-        $this->paymentRepository->update($payment->id, [
-            'gateway_reference' => $result['authority'],
-            'status' => LoanPayment::STATUS_PENDING,
+        // Deduct from user's wallet
+        $userWallet->decrement('balance', $amountInRials);
+        
+        // Add to admin's wallet
+        $adminWallet->increment('balance', $amountInRials);
+
+        // Update payment status to completed
+        $payment->update([
+            'payment_method' => LoanPayment::METHOD_WALLET,
+            'status' => LoanPayment::STATUS_COMPLETED,
         ]);
+
+        // Update schedule
+        $newPaidAmount = $schedule->paid_amount + $amount;
+        $schedule->update([
+            'paid_amount' => $newPaidAmount,
+            'paid_at' => now(),
+        ]);
+
+        // Update schedule status
+        if ($newPaidAmount >= $schedule->amount_due) {
+            $schedule->update(['status' => LoanSchedule::STATUS_PAID]);
+        } else {
+            $schedule->update(['status' => LoanSchedule::STATUS_PARTIAL]);
+        }
+
+        // Update loan balance
+        $loan->decrement('remaining_balance', $amount);
+        $loan->refresh();
+
+        // Check if loan is fully paid
+        if ($loan->remaining_balance <= 0 && $loan->status === Loan::STATUS_ACTIVE) {
+            $loan->update(['status' => Loan::STATUS_PAID]);
+            $this->notificationService->notifyLoanFullyPaid($user, $loan);
+        }
+
+        // Create wallet transactions
+        WalletTransaction::create([
+            'wallet_id' => $userWallet->id,
+            'type' => WalletTransaction::TYPE_DEBIT,
+            'amount' => $amountInRials,
+            'balance_after' => $userWallet->fresh()->balance,
+            'description' => "پرداخت قسط {$schedule->installment_number} وام {$loan->id}",
+            'meta' => ['payment_id' => $payment->id, 'loan_id' => $loan->id],
+        ]);
+
+        WalletTransaction::create([
+            'wallet_id' => $adminWallet->id,
+            'type' => WalletTransaction::TYPE_CREDIT,
+            'amount' => $amountInRials,
+            'balance_after' => $adminWallet->fresh()->balance,
+            'description' => "دریافت قسط {$schedule->installment_number} وام {$loan->id}",
+            'meta' => ['payment_id' => $payment->id, 'user_id' => $user->id, 'loan_id' => $loan->id],
+        ]);
+
+        // Clear cache
+        Cache::forget("wallet.user.{$user->id}");
+        Cache::forget("wallet.balance.{$userWallet->id}");
+        Cache::forget("wallet.balance.{$adminWallet->id}");
+        Cache::forget("wallet.shared.admin");
 
         return [
             'success' => true,
-            'payment_url' => $result['payment_url'],
-            'authority' => $result['authority'],
+            'message' => 'پرداخت با موفقیت انجام شد',
             'payment_id' => $payment->id,
+            'schedule_status' => $schedule->status,
+            'remaining_balance' => $loan->remaining_balance,
         ];
+        });
     }
 
     /**
