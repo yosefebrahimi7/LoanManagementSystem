@@ -53,7 +53,18 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
+            "@php artisan test",
+            "@php artisan migrate:fresh --seed --force"
+        ],
+        "test-no-seed": [
+            "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "seed": [
+            "@php artisan db:seed"
+        ],
+        "fresh-seed": [
+            "@php artisan migrate:fresh --seed"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
