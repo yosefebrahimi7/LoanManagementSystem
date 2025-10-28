@@ -172,16 +172,37 @@ php artisan loans:process-penalties
 - `POST /api/loans` - ایجاد درخواست وام
 - `GET /api/loans/{id}` - جزئیات وام
 
-### Admin
-- `GET /api/admin/loans` - لیست تمام وام‌ها
-- `POST /api/admin/loans/{id}/approve` - تایید/رد وام
-- `GET /api/admin/loans/stats` - آمار وام‌ها
+### Admin - Loans
+- `GET /api/admin/loans` - لیست تمام وام‌ها (Admin only)
+- `POST /api/admin/loans/{id}/approve` - تایید/رد وام (Admin only)
+- `GET /api/admin/loans/stats` - آمار وام‌ها (Admin only)
+
+### Admin - Users
+- `GET /api/users` - لیست کاربران (Admin only)
+- `POST /api/users` - ایجاد کاربر جدید (Admin only)
+- `GET /api/users/{id}` - جزئیات کاربر (Admin only)
+- `PUT /api/users/{id}` - ویرایش کاربر (Admin only)
+- `DELETE /api/users/{id}` - حذف کاربر (Admin only)
+- `PATCH /api/users/{id}/toggle-status` - فعال/غیرفعال کردن کاربر (Admin only)
 
 ### Payments
 - `GET /api/payment/history` - تاریخچه پرداخت‌ها
-- `POST /api/payment/loans/{loan}/initiate` - شروع پرداخت
+- `POST /api/payment/loans/{loan}/initiate` - شروع پرداخت قسط
 - `GET /api/payment/status/{payment}` - وضعیت پرداخت
-- `POST /api/payment/callback` - کال‌بک درگاه
+- `POST /api/payment/callback` - کال‌بک درگاه (Public)
+
+### Wallet
+- `GET /api/wallet` - مشاهده موجودی کیف پول
+- `GET /api/wallet/transactions` - تاریخچه تراکنش‌های کیف پول
+- `POST /api/wallet/recharge` - شارژ کیف پول
+- `POST /api/wallet/callback` - کال‌بک شارژ کیف پول (Public)
+
+### Notifications
+- `GET /api/notifications` - لیست اعلان‌ها
+- `GET /api/notifications/unread-count` - تعداد اعلان‌های خوانده نشده
+- `PATCH /api/notifications/{id}/read` - علامت‌گذاری به عنوان خوانده شده
+- `PATCH /api/notifications/mark-all-read` - علامت‌گذاری همه به عنوان خوانده شده
+- `DELETE /api/notifications/{id}` - حذف اعلان
 
 ---
 

@@ -4,6 +4,7 @@ A production-ready Loan Management System built with Laravel that allows users t
 
 ## Features
 
+### Core Features
 - ✅ User authentication with Sanctum
 - ✅ Loan request and approval system
 - ✅ Automated payment schedule generation
@@ -11,16 +12,39 @@ A production-ready Loan Management System built with Laravel that allows users t
 - ✅ Zarinpal payment gateway integration
 - ✅ Personal wallet with transaction ledger
 - ✅ Admin panel for loan management
+- ✅ User management (Admin only)
+- ✅ Notification system
+- ✅ Custom 404 page (Persian)
 - ✅ RESTful API for client applications
+- ✅ Swagger API Documentation (v2.0.0)
+
+### Frontend Features
+- ✅ React 18 with TypeScript
+- ✅ Responsive design with DaisyUI
+- ✅ RTL support for Persian
+- ✅ Protected and Admin routes
+- ✅ Real-time state management with Zustand
+- ✅ TanStack Query for data fetching
 
 ## Tech Stack
 
+### Backend
 - **Laravel 12**
 - **PHP 8.2+**
 - **MySQL/PostgreSQL**
 - **Sanctum** (API Authentication)
 - **Pest** (Testing Framework)
-- **TailwindCSS** (Frontend)
+- **L5-Swagger** (API Documentation)
+
+### Frontend
+- **React 18** with TypeScript
+- **Vite** (Build tool)
+- **React Router** (Navigation)
+- **TanStack Query** (Data fetching)
+- **Zustand** (State management)
+- **DaisyUI** (UI Components)
+- **TailwindCSS** (Styling)
+- **Yekan Bakh** (Persian font)
 
 ## Quick Start
 

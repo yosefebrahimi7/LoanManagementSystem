@@ -7,13 +7,18 @@ use Illuminate\Http\Request;
 /**
  * @OA\Info(
  *   title="Loan Management System API",
- *   version="1.0.0",
- *   description="API documentation for Loan Management System"
+ *   version="2.0.0",
+ *   description="سیستم جامع مدیریت وام - API Documentation\n\nاین API شامل بخش‌های زیر است:\n- Authentication: احراز هویت و مدیریت کاربر\n- Loans: مدیریت وام‌ها و درخواست‌ها\n- Payments: سیستم پرداخت و درگاه زرین‌پال\n- Wallet: کیف پول و تراکنش‌ها\n- Notifications: سیستم اعلان‌رسانی\n- Users: مدیریت کاربران (فقط ادمین)"
  * )
  * 
  * @OA\Server(
  *   url="http://localhost:8000",
- *   description="API Server"
+ *   description="Development Server"
+ * )
+ * 
+ * @OA\Server(
+ *   url="https://api.yourdomain.com",
+ *   description="Production Server"
  * )
  * 
  * @OA\SecurityScheme(

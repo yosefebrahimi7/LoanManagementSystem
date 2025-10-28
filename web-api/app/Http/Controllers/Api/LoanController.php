@@ -158,6 +158,23 @@ class LoanController extends Controller
 
     /**
      * Get all loans for admin
+     * 
+     * @OA\Get(
+     *   path="/api/admin/loans",
+     *   tags={"Loans", "Admin"},
+     *   summary="Get all loans (Admin only)",
+     *   operationId="getAllLoans",
+     *   security={{"sanctum": {}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="List of all loans",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Unauthorized - Admin access required")
+     * )
      */
     public function adminIndex(Request $request): JsonResponse
     {
@@ -256,6 +273,33 @@ class LoanController extends Controller
 
     /**
      * Get loan statistics (Admin only)
+     * 
+     * @OA\Get(
+     *   path="/api/admin/loans/stats",
+     *   tags={"Loans", "Admin"},
+     *   summary="Get loan statistics (Admin only)",
+     *   operationId="getLoanStats",
+     *   security={{"sanctum": {}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="Loan statistics",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(
+     *         property="data",
+     *         type="object",
+     *         @OA\Property(property="total_loans", type="integer", example=150),
+     *         @OA\Property(property="pending_loans", type="integer", example=25),
+     *         @OA\Property(property="approved_loans", type="integer", example=100),
+     *         @OA\Property(property="rejected_loans", type="integer", example=15),
+         *         @OA\Property(property="active_loans", type="integer", example=75),
+         *         @OA\Property(property="total_amount", type="integer", example=1500000000),
+         *         @OA\Property(property="total_paid", type="integer", example=500000000)
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Unauthorized - Admin access required")
+     * )
      */
     public function stats(Request $request): JsonResponse
     {
