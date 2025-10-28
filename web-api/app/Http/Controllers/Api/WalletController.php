@@ -10,6 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\Tag(
+ *   name="Wallet",
+ *   description="Wallet management endpoints"
+ * )
+ */
 class WalletController extends Controller
 {
     public function __construct(
@@ -18,6 +24,30 @@ class WalletController extends Controller
 
     /**
      * Get user's wallet balance
+     * 
+     * @OA\Get(
+     *   path="/api/wallet",
+     *   tags={"Wallet"},
+     *   summary="Get wallet balance",
+     *   operationId="getWallet",
+     *   security={{"sanctum": {}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="Wallet information",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(
+     *         property="data",
+     *         type="object",
+     *         @OA\Property(property="id", type="integer", example=1),
+     *         @OA\Property(property="balance", type="integer", example=0),
+     *         @OA\Property(property="formatted_balance", type="string", example="0.00"),
+     *         @OA\Property(property="currency", type="string", example="IRR"),
+     *         @OA\Property(property="is_shared", type="boolean", example=false)
+     *       )
+     *     )
+     *   )
+     * )
      */
     public function index(): JsonResponse
     {
@@ -46,6 +76,33 @@ class WalletController extends Controller
 
     /**
      * Get wallet transactions
+     * 
+     * @OA\Get(
+     *   path="/api/wallet/transactions",
+     *   tags={"Wallet"},
+     *   summary="Get wallet transactions",
+     *   operationId="getWalletTransactions",
+     *   security={{"sanctum": {}}},
+     *   @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     @OA\Schema(type="integer", default=1)
+     *   ),
+     *   @OA\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     @OA\Schema(type="integer", default=10)
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Wallet transactions",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="meta", type="object")
+     *     )
+     *   )
+     * )
      */
     public function transactions(Request $request): JsonResponse
     {
@@ -74,6 +131,36 @@ class WalletController extends Controller
 
     /**
      * Initiate wallet recharge
+     * 
+     * @OA\Post(
+     *   path="/api/wallet/recharge",
+     *   tags={"Wallet"},
+     *   summary="Initiate wallet recharge",
+     *   operationId="rechargeWallet",
+     *   security={{"sanctum": {}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"amount", "method"},
+     *       @OA\Property(property="amount", type="integer", example=1000000, description="Amount in Tomans (min: 10,000, max: 2,000,000,000)"),
+     *       @OA\Property(property="method", type="string", example="zarinpal")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Payment initiated",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(
+     *         property="data",
+     *         type="object",
+     *         @OA\Property(property="payment_url", type="string"),
+     *         @OA\Property(property="authority", type="string"),
+     *         @OA\Property(property="transaction_id", type="integer")
+     *       )
+     *     )
+     *   )
+     * )
      */
     public function recharge(WalletRechargeRequest $request): JsonResponse
     {
@@ -97,6 +184,24 @@ class WalletController extends Controller
 
     /**
      * Handle wallet recharge callback from payment gateway
+     * 
+     * @OA\Post(
+     *   path="/api/wallet/callback",
+     *   tags={"Wallet"},
+     *   summary="Wallet recharge callback",
+     *   operationId="walletRechargeCallback",
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="Authority", type="string"),
+     *       @OA\Property(property="Status", type="string")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Callback processed"
+     *   )
+     * )
      */
     public function callback(Request $request)
     {
