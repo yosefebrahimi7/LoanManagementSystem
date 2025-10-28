@@ -26,25 +26,24 @@ export const useWalletTransactions = (page = 1, limit = 10) => {
   });
 };
 
-// Hook for adding money to wallet
+// Hook for adding money to wallet (recharge)
 export const useAddToWallet = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ amount, method }: { amount: number; method: string }) => {
-      const response = await appHttp.post('/wallet/add', {
+      const response = await appHttp.post('/wallet/recharge', {
         amount,
         method,
       });
       return response.data.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      queryClient.invalidateQueries({ queryKey: ['wallet-transactions'] });
-      showSuccessToast('موجودی با موفقیت اضافه شد');
+    onSuccess: (data) => {
+      // Don't show toast if redirecting to payment gateway
+      if (!data.payment_url) {
+        showSuccessToast('موجودی با موفقیت اضافه شد');
+      }
     },
     onError: (error: any) => {
-      showErrorToast(error.response?.data?.message || 'خطا در اضافه کردن موجودی');
+      showErrorToast(error.response?.data?.message || 'خطا در شارژ کیف پول');
     },
   });
 };

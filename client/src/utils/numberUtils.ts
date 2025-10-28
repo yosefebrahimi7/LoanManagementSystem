@@ -54,3 +54,15 @@ export const formatAmountToPersianWords = (amount: string | number): string => {
   }
 };
 
+/**
+ * Format currency with commas (for display purposes)
+ */
+export const formatCurrency = (amount: string | number): string => {
+  if (!amount && amount !== 0) return '۰';
+  
+  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  if (isNaN(num)) return '۰';
+  
+  return num.toLocaleString('en-US');
+};
+
