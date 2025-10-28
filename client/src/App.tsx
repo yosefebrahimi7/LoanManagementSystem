@@ -11,6 +11,8 @@ import LoanDetails from "./pages/LoanDetails";
 import LoanPayment from "./pages/LoanPayment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
+import WalletRechargeSuccess from "./pages/WalletRechargeSuccess";
+import WalletRechargeFailed from "./pages/WalletRechargeFailed";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import Layout from "./components/Layout";
@@ -109,6 +111,14 @@ const router = createBrowserRouter([
         {
           path: "/payment/failed",
           element: <PaymentFailed />,
+        },
+        {
+          path: "/wallet/recharge/success",
+          element: <WalletRechargeSuccess />,
+        },
+        {
+          path: "/wallet/recharge/failed",
+          element: <WalletRechargeFailed />,
         },
 ]);
 
