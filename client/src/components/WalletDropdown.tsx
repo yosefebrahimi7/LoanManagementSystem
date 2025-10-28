@@ -25,7 +25,7 @@ function WalletDropdown() {
   const balance = wallet?.balance || 0;
 
   const handleRecharge = () => {
-    if (!rechargeAmount || parseFloat(rechargeAmount) < 10000 || parseFloat(rechargeAmount) > 10000000000) {
+    if (!rechargeAmount || parseFloat(rechargeAmount) < 10000 || parseFloat(rechargeAmount) > 20000000000) {
       return;
     }
 
@@ -178,7 +178,7 @@ function WalletDropdown() {
                 value={rechargeAmount}
                 onChange={(e) => setRechargeAmount(e.target.value)}
                 min="10000"
-                max="10000000000"
+                max="20000000000"
               />
               {rechargeAmount && (
                 <div className="mt-2 text-sm text-gray-600 rtl">
@@ -206,7 +206,7 @@ function WalletDropdown() {
                   rechargeMutation.isPending ||
                   !rechargeAmount ||
                   parseFloat(rechargeAmount) < 10000 ||
-                  parseFloat(rechargeAmount) > 10000000000
+                  parseFloat(rechargeAmount) > 20000000000
                 }
               >
                 {rechargeMutation.isPending ? (
