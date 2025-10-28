@@ -13,6 +13,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import WalletRechargeSuccess from "./pages/WalletRechargeSuccess";
 import WalletRechargeFailed from "./pages/WalletRechargeFailed";
+import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import Layout from "./components/Layout";
@@ -120,6 +121,15 @@ const router = createBrowserRouter([
           path: "/wallet/recharge/failed",
           element: <WalletRechargeFailed />,
         },
+  // Catch-all route for 404
+  {
+    path: "*",
+    element: (
+      <Layout>
+        <NotFound />
+      </Layout>
+    ),
+  },
 ]);
 
 function App() {
