@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Exceptions\NotFoundException;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\NotificationResource;
 use App\Services\Interfaces\NotificationServiceInterface;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
@@ -61,7 +62,10 @@ class NotificationController extends Controller
         
         $data = $this->notificationService->getUserNotifications($user, $limit);
 
-        return $this->successResponse($data);
+        return $this->successResponse([
+            'notifications' => NotificationResource::collection($data['notifications']),
+            'unread_count' => $data['unread_count'],
+        ]);
     }
 
     /**

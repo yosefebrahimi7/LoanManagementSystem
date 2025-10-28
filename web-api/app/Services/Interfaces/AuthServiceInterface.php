@@ -24,7 +24,7 @@ interface AuthServiceInterface
     /**
      * Get authenticated user
      */
-    public function getAuthenticatedUser(User $user): array;
+    public function getAuthenticatedUser(User $user): User;
 
     /**
      * Refresh token

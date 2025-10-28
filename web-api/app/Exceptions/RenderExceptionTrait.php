@@ -13,7 +13,7 @@ trait RenderExceptionTrait
      */
     public function getStatusCode(): int
     {
-        return $this->statusCode;
+        return $this->statusCode ?? 500;
     }
 
     /**

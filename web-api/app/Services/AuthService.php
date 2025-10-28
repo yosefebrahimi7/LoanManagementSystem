@@ -53,7 +53,7 @@ class AuthService implements AuthServiceInterface
         $token = $this->createToken($user);
 
         return [
-            'user' => $this->formatUserData($user),
+            'user' => $user, // Return User object, let Resource handle formatting
             'token' => $token,
             'refreshToken' => $token, // For simplicity, using same token as refresh
         ];
@@ -91,7 +91,7 @@ class AuthService implements AuthServiceInterface
         $token = $this->createToken($user);
 
         return [
-            'user' => $this->formatUserData($user),
+            'user' => $user, // Return User object, let Resource handle formatting
             'token' => $token,
             'refreshToken' => $token, // For simplicity, using same token as refresh
         ];
@@ -109,9 +109,9 @@ class AuthService implements AuthServiceInterface
     /**
      * Get authenticated user
      */
-    public function getAuthenticatedUser(User $user): array
+    public function getAuthenticatedUser(User $user): User
     {
-        return $this->formatUserData($user);
+        return $user;
     }
 
     /**

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WalletRechargeRequest;
+use App\Http\Resources\WalletResource;
+use App\Http\Resources\WalletTransactionResource;
 use App\Models\Wallet;
 use App\Services\Interfaces\WalletServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -57,13 +59,7 @@ class WalletController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'id' => $wallet->id,
-                    'balance' => $wallet->balance,
-                    'formatted_balance' => $wallet->formatted_balance,
-                    'currency' => $wallet->currency,
-                    'is_shared' => $wallet->is_shared,
-                ],
+                'data' => new WalletResource($wallet),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -117,7 +113,7 @@ class WalletController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $result['data'],
+                'data' => WalletTransactionResource::collection($result['data']),
                 'meta' => $result['meta'],
             ]);
         } catch (\Exception $e) {

@@ -18,10 +18,11 @@ class WalletResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'balance' => $this->balance,
-            'formatted_balance' => number_format($this->balance / 100, 2),
+            'formatted_balance' => $this->formatted_balance,
             'currency' => $this->currency,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'is_shared' => $this->is_shared ?? false,
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
             
             // Relationships
             'user' => new UserResource($this->whenLoaded('user')),

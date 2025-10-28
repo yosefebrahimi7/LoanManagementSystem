@@ -66,14 +66,14 @@ class AuthController extends Controller
             $result = $this->authService->register($data);
 
             return $this->successResponse([
-                'user' => $result['user'],
+                'user' => new UserResource($result['user']),
                 'token' => $result['token'],
                 'refreshToken' => $result['refreshToken'],
             ], 'ثبت نام با موفقیت انجام شد', 201);
         } catch (AuthException $e) {
             return $this->errorResponse($e->getMessage(), $e->getStatusCode());
         } catch (\Exception $e) {
-            $statusCode = is_numeric($e->getCode()) ? (int)$e->getCode() : 500;
+            $statusCode = (is_numeric($e->getCode()) && $e->getCode() > 0) ? (int)$e->getCode() : 500;
             return $this->errorResponse($e->getMessage(), $statusCode);
         }
     }
@@ -114,14 +114,14 @@ class AuthController extends Controller
             $result = $this->authService->login($credentials);
 
             return $this->successResponse([
-                'user' => $result['user'],
+                'user' => new UserResource($result['user']),
                 'token' => $result['token'],
                 'refreshToken' => $result['refreshToken'],
             ], 'ورود با موفقیت انجام شد');
         } catch (AuthException $e) {
             return $this->errorResponse($e->getMessage(), $e->getStatusCode());
         } catch (\Exception $e) {
-            $statusCode = is_numeric($e->getCode()) ? (int)$e->getCode() : 500;
+            $statusCode = (is_numeric($e->getCode()) && $e->getCode() > 0) ? (int)$e->getCode() : 500;
             return $this->errorResponse($e->getMessage(), $statusCode);
         }
     }
@@ -178,9 +178,11 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         try {
-            $user = $this->authService->getAuthenticatedUser($request->user());
+            $user = $request->user();
 
-            return $this->successResponse(['user' => $user]);
+            return $this->successResponse([
+                'user' => new UserResource($user)
+            ]);
         } catch (\Exception $e) {
             return $this->errorResponse('خطا در دریافت اطلاعات کاربر');
         }
