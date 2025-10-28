@@ -32,7 +32,7 @@ function WalletDropdown() {
     }
 
     rechargeMutation.mutate(
-      { amount: parseInt(rechargeAmount) * 10, method: 'zarinpal' },
+      { amount: parseInt(rechargeAmount), method: 'zarinpal' },
       {
         onSuccess: (data) => {
           if (data.payment_url) {
