@@ -6,18 +6,24 @@ use App\Events\LoanApproved;
 use App\Events\LoanRejected;
 use App\Events\LoanRequested;
 use App\Exceptions\LoanException;
+use App\Jobs\DeductFromUserWalletJob;
 use App\Models\Loan;
 use App\Models\LoanSchedule;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Repositories\Interfaces\LoanRepositoryInterface;
+use App\Repositories\Interfaces\WalletRepositoryInterface;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class LoanService
 {
     public function __construct(
-        private LoanRepositoryInterface $loanRepository
+        private LoanRepositoryInterface $loanRepository,
+        private WalletRepositoryInterface $walletRepository,
+        private NotificationService $notificationService
     ) {}
     /**
      * Create a new loan request
@@ -60,6 +66,46 @@ class LoanService
     {
         return DB::transaction(function () use ($loan, $admin, $data) {
             if ($data['action'] === 'approve') {
+                // Check if admin wallet has sufficient balance
+                $adminWallet = $this->walletRepository->getOrCreateSharedAdminWallet();
+                $loanAmount = $loan->amount;
+                
+                // Convert loan amount to the wallet unit (Rials if needed)
+                // Loan amounts are stored in Tomans, wallet is in Rials (1 Toman = 10 Rials)
+                $loanAmountInRials = $loanAmount * 10;
+                
+                if (!$this->walletRepository->hasSufficientBalance($adminWallet->id, $loanAmountInRials)) {
+                    // Notify all admins about insufficient wallet balance
+                    $this->notificationService->notifyAdminWalletLow(
+                        $adminWallet->balance,
+                        $loanAmountInRials
+                    );
+                    
+                    throw LoanException::badRequest(
+                        'موجودی کیف پول مشترک ادمین ها کافی نیست. موجودی: ' . 
+                        number_format($adminWallet->balance / 100, 0) . 
+                        ' تومان. مبلغ مورد نیاز: ' . 
+                        number_format($loanAmountInRials / 100, 0) . 
+                        ' تومان. لطفاً کیف پول را شارژ کنید.'
+                    );
+                }
+
+                // Deduct from admin wallet within the transaction
+                DB::transaction(function () use ($adminWallet, $loanAmountInRials, $loan) {
+                    // Lock admin wallet for update
+                    $lockedWallet = \App\Models\Wallet::lockForUpdate()->find($adminWallet->id);
+                    
+                    if (!$lockedWallet || $lockedWallet->balance < $loanAmountInRials) {
+                        throw LoanException::badRequest('خطا در کسر از کیف پول ادمین');
+                    }
+                    
+                    // Deduct from admin wallet
+                    $lockedWallet->decrement('balance', $loanAmountInRials);
+                });
+
+                // Add to user's wallet via background job (outside transaction)
+                DeductFromUserWalletJob::dispatch($loan->user_id, $loanAmountInRials);
+
                 $this->loanRepository->update($loan->id, [
                     'status' => Loan::STATUS_APPROVED,
                     'approved_at' => now(),

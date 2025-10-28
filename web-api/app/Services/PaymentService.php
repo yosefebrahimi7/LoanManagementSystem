@@ -5,11 +5,15 @@ namespace App\Services;
 use App\Events\PaymentFailed;
 use App\Events\InstallmentPaid;
 use App\Events\LoanFullyPaid;
+use App\Jobs\ProcessPaymentWalletUpdateJob;
 use App\Models\Loan;
 use App\Models\LoanPayment;
 use App\Models\LoanSchedule;
+use App\Models\WalletTransaction;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
+use App\Repositories\Interfaces\WalletRepositoryInterface;
 use App\Services\Interfaces\PaymentServiceInterface;
+use App\Services\NotificationService;
 use App\Services\ZarinpalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +24,9 @@ class PaymentService implements PaymentServiceInterface
 {
     public function __construct(
         private PaymentRepositoryInterface $paymentRepository,
-        private ZarinpalService $zarinpalService
+        private WalletRepositoryInterface $walletRepository,
+        private ZarinpalService $zarinpalService,
+        private NotificationService $notificationService
     ) {}
 
     /**
@@ -41,6 +47,34 @@ class PaymentService implements PaymentServiceInterface
         
         if ($amount <= 0) {
             throw LoanException::badRequest('مبلغ نامعتبر است');
+        }
+
+        // Check user's wallet balance
+        $user = auth()->user();
+        $userWallet = $this->walletRepository->findByUserId($user->id);
+        
+        if (!$userWallet) {
+            throw LoanException::badRequest('کیف پول شما یافت نشد. لطفاً حساب خود را شارژ کنید.');
+        }
+
+        // Convert amount from Tomans to Rials for comparison with wallet balance
+        $amountInRials = $amount * 10;
+        
+        if (!$this->walletRepository->hasSufficientBalance($userWallet->id, $amountInRials)) {
+            // Notify user about insufficient wallet balance
+            $this->notificationService->notifyWalletInsufficient(
+                $user,
+                $userWallet->balance,
+                $amountInRials
+            );
+            
+            throw LoanException::badRequest(
+                'موجودی کیف پول شما کافی نیست. موجودی: ' . 
+                number_format($userWallet->balance / 100, 0) . 
+                ' تومان. مبلغ مورد نیاز: ' . 
+                number_format($amount, 0) . 
+                ' تومان. لطفاً کیف پول خود را شارژ کنید.'
+            );
         }
 
         // Create payment record using Repository
@@ -253,6 +287,18 @@ class PaymentService implements PaymentServiceInterface
             }
 
             DB::commit();
+
+            // Dispatch wallet update job (deduct from user, add to admin)
+            $adminWallet = $this->walletRepository->getSharedAdminWallet();
+            if ($adminWallet) {
+                $amountInRials = $payment->amount * 10; // Convert to Rials
+                ProcessPaymentWalletUpdateJob::dispatch(
+                    $payment->user_id,
+                    $adminWallet->id,
+                    $amountInRials,
+                    $payment->id
+                );
+            }
 
             // Fire events after successful commit
             if ($wasScheduleFullyPaid && $schedule) {

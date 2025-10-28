@@ -262,43 +262,50 @@ class WalletService implements WalletServiceInterface
      */
     private function completeRecharge(WalletTransaction $transaction, Wallet $wallet, array $verifyResult): void
     {
-        DB::beginTransaction();
-        try {
-            // Update transaction
-            $transaction->update([
-                'balance_after' => $wallet->balance + $transaction->amount,
-                'meta' => array_merge($transaction->meta ?? [], [
-                    'status' => 'completed',
-                    'gateway_response' => $verifyResult,
-                    'completed_at' => now()->toDateTimeString(),
-                ]),
-            ]);
+        DB::transaction(function () use ($transaction, $wallet, $verifyResult) {
+            try {
+                // Lock wallet for update to prevent race conditions
+                $wallet = Wallet::lockForUpdate()->find($wallet->id);
+                
+                if (!$wallet) {
+                    throw new \Exception('Wallet not found');
+                }
 
-            // Update wallet balance
-            $wallet->increment('balance', $transaction->amount);
-            
-            // Clear cache
-            Cache::forget("wallet.user.{$wallet->user_id}");
-            Cache::forget("wallet.balance.{$wallet->id}");
-            Cache::forget("wallet.shared.admin");
+                // Calculate balance after
+                $balanceAfter = $wallet->balance + $transaction->amount;
+                
+                // Update transaction
+                $transaction->update([
+                    'balance_after' => $balanceAfter,
+                    'meta' => array_merge($transaction->meta ?? [], [
+                        'status' => 'completed',
+                        'gateway_response' => $verifyResult,
+                        'completed_at' => now()->toDateTimeString(),
+                    ]),
+                ]);
 
-            DB::commit();
+                // Update wallet balance (atomic operation)
+                $wallet->increment('balance', $transaction->amount);
+                
+                // Clear cache
+                Cache::forget("wallet.user.{$wallet->user_id}");
+                Cache::forget("wallet.balance.{$wallet->id}");
+                Cache::forget("wallet.shared.admin");
 
-            Log::info('Wallet recharge completed', [
-                'transaction_id' => $transaction->id,
-                'wallet_id' => $wallet->id,
-                'amount' => $transaction->amount,
-                'balance_after' => $wallet->fresh()->balance,
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Wallet recharge completion failed', [
-                'transaction_id' => $transaction->id,
-                'error' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
+                Log::info('Wallet recharge completed', [
+                    'transaction_id' => $transaction->id,
+                    'wallet_id' => $wallet->id,
+                    'amount' => $transaction->amount,
+                    'balance_after' => $wallet->fresh()->balance,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Wallet recharge completion failed', [
+                    'transaction_id' => $transaction->id,
+                    'error' => $e->getMessage(),
+                ]);
+                throw $e;
+            }
+        });
     }
 
     /**

@@ -61,4 +61,14 @@ interface WalletRepositoryInterface
      * Create or get shared admin wallet
      */
     public function getOrCreateSharedAdminWallet(): Wallet;
+
+    /**
+     * Deduct balance from wallet (atomic operation with check)
+     */
+    public function deductBalance(int $walletId, int $amount): bool;
+
+    /**
+     * Check if wallet has sufficient balance
+     */
+    public function hasSufficientBalance(int $walletId, int $amount): bool;
 }

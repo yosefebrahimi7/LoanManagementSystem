@@ -156,6 +156,38 @@ class WalletRepository implements WalletRepositoryInterface
     }
 
     /**
+     * Deduct balance from wallet (atomic operation with check)
+     */
+    public function deductBalance(int $walletId, int $amount): bool
+    {
+        return DB::transaction(function () use ($walletId, $amount) {
+            $wallet = $this->model->lockForUpdate()->find($walletId);
+            
+            if (!$wallet || $wallet->balance < $amount) {
+                return false;
+            }
+
+            $wallet->decrement('balance', $amount);
+            $this->clearWalletCache($wallet);
+            
+            return true;
+        });
+    }
+
+    /**
+     * Check if wallet has sufficient balance
+     */
+    public function hasSufficientBalance(int $walletId, int $amount): bool
+    {
+        $wallet = $this->model->find($walletId);
+        if (!$wallet) {
+            return false;
+        }
+        
+        return $wallet->balance >= $amount;
+    }
+
+    /**
      * Clear wallet-related cache
      */
     private function clearWalletCache(Wallet $wallet): void
