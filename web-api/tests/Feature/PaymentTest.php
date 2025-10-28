@@ -32,9 +32,16 @@ class PaymentTest extends TestCase
 
         $schedule = LoanSchedule::factory()->create([
             'loan_id' => $loan->id,
-            'amount_due' => 1000000,
+            'amount_due' => 100000, // 100,000 Toman
             'paid_amount' => 0,
             'status' => LoanSchedule::STATUS_PENDING,
+        ]);
+
+        // Fund user wallet with enough balance (1,000,000 Rials = 100,000 Tomans)
+        \App\Models\Wallet::factory()->create([
+            'user_id' => $user->id,
+            'balance' => 1000000, // 1,000,000 Rials = 100,000 Tomans
+            'is_shared' => false,
         ]);
 
         $token = $user->createToken('test')->plainTextToken;

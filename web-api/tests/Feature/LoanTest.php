@@ -66,8 +66,21 @@ class LoanTest extends TestCase
         $user = User::factory()->create();
         $loan = Loan::factory()->create([
             'user_id' => $user->id,
+            'amount' => 1000000, // 1,000,000 Toman
             'status' => Loan::STATUS_PENDING,
         ]);
+
+        // Fund admin wallet with enough balance (in Rials: 10,000,000 Rials = 1,000,000 Tomans)
+        $adminWallet = \App\Models\Wallet::updateOrCreate(
+            [
+                'is_shared' => true,
+                'user_id' => null,
+            ],
+            [
+                'balance' => 10000000, // 10,000,000 Rials
+                'currency' => 'IRR',
+            ]
+        );
 
         $token = $admin->createToken('test')->plainTextToken;
 
@@ -157,10 +170,22 @@ class LoanTest extends TestCase
         $user = User::factory()->create();
         $loan = Loan::factory()->create([
             'user_id' => $user->id,
-            'amount' => 12000000, // 120,000 Toman
+            'amount' => 1200000, // 120,000 Toman
             'term_months' => 12,
             'status' => Loan::STATUS_PENDING,
         ]);
+
+        // Fund admin wallet with enough balance (in Rials: 12,000,000 Rials = 1,200,000 Tomans)
+        $adminWallet = \App\Models\Wallet::updateOrCreate(
+            [
+                'is_shared' => true,
+                'user_id' => null,
+            ],
+            [
+                'balance' => 12000000, // 12,000,000 Rials
+                'currency' => 'IRR',
+            ]
+        );
 
         // Get initial count
         $initialCount = \App\Models\LoanSchedule::count();
