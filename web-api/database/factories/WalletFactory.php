@@ -65,7 +65,7 @@ class WalletFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'user_id' => null,
-            'balance' => 100000000, // 100M Rials = 10M Tomans
+            'balance' => 100000000000, // 100B Rials = 10B Tomans
             'is_shared' => true,
         ]);
     }
